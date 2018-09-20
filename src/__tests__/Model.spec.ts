@@ -1,7 +1,7 @@
 import {
   PropertyNotDefinedError,
   NextModel,
-} from '../next_model';
+} from '../Model';
 
 import Connector from '../connector';
 
@@ -36,7 +36,7 @@ describe('NextModel', () => {
 
     context('model is not extended', {
       definitions() {
-        class NewKlass extends NextModel<any>() {};
+        class NewKlass extends NextModel<any>() { };
         Klass = NewKlass;
       },
       tests() {
@@ -138,7 +138,7 @@ describe('NextModel', () => {
               },
               tests() {
                 it('seperates both parts with underscore', () => {
-                const name = modelName.toLowerCase() + '_' + modelName.toLowerCase();
+                  const name = modelName.toLowerCase() + '_' + modelName.toLowerCase();
                   expect(subject()).toEqual(name);
                 });
               },
@@ -808,10 +808,12 @@ describe('NextModel', () => {
           },
           tests() {
             it('adds filter to existing filter and returns model', () => {
-              expect(subject().filter).toEqual({ $and: [
-                filter,
-                { id: 1 },
-              ]});
+              expect(subject().filter).toEqual({
+                $and: [
+                  filter,
+                  { id: 1 },
+                ]
+              });
             });
           },
         });
@@ -1630,7 +1632,7 @@ describe('NextModel', () => {
 
     context('model is not extended', {
       definitions() {
-        class NewKlass extends Faker.model {};
+        class NewKlass extends Faker.model { };
         Klass = NewKlass;
       },
       tests() {
