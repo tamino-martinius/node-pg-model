@@ -6,7 +6,7 @@
 
 # Temporary Docs
 
-Rails like models using **TypeScript**. [![Build Status](https://travis-ci.org/tamino-martinius/node-next-model.svg?branch=master)](https://travis-ci.org/tamino-martinius/node-next-model)
+Rails like models using **TypeScript**. [![Build Status](https://travis-ci.org/tamino-martinius/node-pg-model.svg?branch=master)](https://travis-ci.org/tamino-martinius/node-pg-model)
 
 NextModel gives you the ability to:
 
@@ -18,7 +18,7 @@ NextModel gives you the ability to:
 
 ## Roadmap / Where can i contribute
 
-See [GitHub](https://github.com/tamino-martinius/node-next-model/projects/1) project for current progress/tasks
+See [GitHub](https://github.com/tamino-martinius/node-pg-model/projects/1) project for current progress/tasks
 
 * Fix **typos**
 * Improve **documentation**
@@ -547,8 +547,8 @@ A connector is the bridge between models and the database. NextModel comes with 
 
 Available connectors:
 
-* WIP [knex](https://github.com/tamino-martinius/node-next-model-knex-connector.git) (mySQL, postgres, sqlite3, ...)
-* WIP [local-storage](https://github.com/tamino-martinius/node-next-model-local-storage-connector.git) (Client side for Browser usage)
+* WIP [knex](https://github.com/tamino-martinius/node-pg-model-knex-connector.git) (mySQL, postgres, sqlite3, ...)
+* WIP [local-storage](https://github.com/tamino-martinius/node-pg-model-local-storage-connector.git) (Client side for Browser usage)
 
 ~~~js
 const Connector = require('next-model-knex-connector');
@@ -992,5 +992,5 @@ See [history](HISTORY.md) for more details.
 * `0.1.0` **2017-02-23** Added Browser compatibility
 * `0.0.4` **2017-02-16** Added callbacks for `build`, `create`, `save` and `delete`
 * `0.0.3` **2017-02-12** Added CI
-* `0.0.2` **2017-02-05** Published [knex connector](https://github.com/tamino-martinius/node-next-model-knex-connector.git)
+* `0.0.2` **2017-02-05** Published [knex connector](https://github.com/tamino-martinius/node-pg-model-knex-connector.git)
 * `0.0.1` **2017-01-23** Initial commit with query and scoping functions
