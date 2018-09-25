@@ -1,4 +1,4 @@
 export function staticImplements<T>() {
-  return (_constructor: T) => {
+  return (_: T) => {
   };
 }
