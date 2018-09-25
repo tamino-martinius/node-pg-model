@@ -6,6 +6,19 @@ import {
   BaseType,
 } from './types';
 
+async function propertyFilter<S extends Schema>(values: any[], filters: Partial<S>): Promise<string> {
+  let queryParts: string[] = [];
+  let query = '(1 = 1)';
+  if (Object.keys(filters).length > 0) {
+    for (const column in filters) {
+      values.push(filters[column]);
+      queryParts.push(`("${column}" = $${values.length})`);
+    }
+    query = queryParts.join(' AND ');
+  }
+  return query;
+};
+
 export function getConnector<S extends Schema>(): Connector<S> {
   return {
     query(model: ModelStatic<S>): Promise<ModelConstructor<S>[]> {
