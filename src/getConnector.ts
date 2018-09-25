@@ -14,7 +14,7 @@ export function getConnector<S extends Schema>(): Connector<S> {
     count(model: ModelStatic<S>): Promise<number> {
       throw 'not yet implemented';
     },
-    select(model: ModelStatic<S>, ...keys: (keyof S)[]): Promise<S[keyof S][][]> {
+    select(model: ModelStatic<S>, keys: (keyof S)[]): Promise<S[keyof S][][]> {
       throw 'not yet implemented';
     },
     updateAll(model: ModelStatic<S>, attrs: Partial<S>): Promise<number> {
