@@ -4,6 +4,7 @@ import {
   Schema,
   Connector,
   BaseType,
+  Filter,
   FilterSpecial,
 } from './types';
 
@@ -55,6 +56,16 @@ async function specialFilter<S extends Schema>(values: any[], filter: FilterSpec
   throw '[TODO] Should not reach error';
 };
 
+async function filter<S extends Schema>(values: any[], filters: Filter<S>): Promise<string> {
+  for (const key in filters) {
+    if (key.startsWith('$')) {
+      return await specialFilter(values, <FilterSpecial<S>>filters);
+    }
+  }
+  return await propertyFilter(values, <Partial<S>>filters);
+}
+
+
 export function getConnector<S extends Schema>(): Connector<S> {
   return {
     query(model: ModelStatic<S>): Promise<ModelConstructor<S>[]> {
@@ -85,4 +96,9 @@ export function getConnector<S extends Schema>(): Connector<S> {
       throw 'not yet implemented';
     },
   };
+};
+
+private collection(model: ModelStatic<S>): S[] {
+  return this.storage[model.modelName] = this.storage[model.modelName] || [];
+}
 }
