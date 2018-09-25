@@ -4,6 +4,7 @@ import {
   Schema,
   Connector,
   BaseType,
+  FilterSpecial,
 } from './types';
 
 async function propertyFilter<S extends Schema>(values: any[], filters: Partial<S>): Promise<string> {
@@ -17,6 +18,41 @@ async function propertyFilter<S extends Schema>(values: any[], filters: Partial<
     query = queryParts.join(' AND ');
   }
   return query;
+};
+
+async function specialFilter<S extends Schema>(values: any[], filter: FilterSpecial<S>): Promise<string> {
+  if (Object.keys(filter).length !== 1) throw '[TODO] Return proper error';
+  // if (filter.$and !== undefined)
+  //   return await andFilter(values, filter.$and);
+  // if (filter.$or !== undefined)
+  //   return await  orFilter(values, filter.$or);
+  // if (filter.$not !== undefined)
+  //   return await  notFilter(values, filter.$not);
+  // if (filter.$in !== undefined)
+  //   return await  inFilter(values, filter.$in);
+  // if (filter.$notIn !== undefined)
+  //   return await  notInFilter(values, filter.$notIn);
+  // if (filter.$null !== undefined)
+  //   return await  nullFilter(values, filter.$null);
+  // if (filter.$notNull !== undefined)
+  //   return await  notNullFilter(values, filter.$notNull);
+  // if (filter.$between !== undefined)
+  //   return await  betweenFilter(values, filter.$between);
+  // if (filter.$notBetween !== undefined)
+  //   return await  notBetweenFilter(values, filter.$notBetween);
+  // if (filter.$gt !== undefined)
+  //   return await  gtFilter(values, filter.$gt);
+  // if (filter.$gte !== undefined)
+  //   return await  gteFilter(values, filter.$gte);
+  // if (filter.$lt !== undefined)
+  //   return await  ltFilter(values, filter.$lt);
+  // if (filter.$lte !== undefined)
+  //   return await  lteFilter(values, filter.$lte);
+  // if (filter.$raw !== undefined)
+  //   return await  rawFilter(values, filter.$raw);
+  // if (filter.$async !== undefined)
+  //   return await  asyncFilter(values, filter.$async);
+  throw '[TODO] Should not reach error';
 };
 
 export function getConnector<S extends Schema>(): Connector<S> {
