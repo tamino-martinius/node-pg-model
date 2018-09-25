@@ -39,14 +39,18 @@ async function orFilter<S extends Schema>(values: any[], filters: Filter<S>[]): 
   return query;
 };
 
+async function notFilter<S extends Schema>(values: any[], filters: Filter<S>): Promise<string> {
+  return `(NOT (${await filter(values, filters)}))`;
+};
+
 async function specialFilter<S extends Schema>(values: any[], filter: FilterSpecial<S>): Promise<string> {
   if (Object.keys(filter).length !== 1) throw '[TODO] Return proper error';
-  // if (filter.$not !== undefined)
-  //   return await  notFilter(values, filter.$not);
   if (filter.$and !== undefined)
     return await andFilter(values, filter.$and);
   if (filter.$or !== undefined)
     return await orFilter(values, filter.$or);
+  if (filter.$not !== undefined)
+    return await notFilter(values, filter.$not);
   // if (filter.$in !== undefined)
   //   return await  inFilter(values, filter.$in);
   // if (filter.$notIn !== undefined)
