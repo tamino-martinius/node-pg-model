@@ -252,7 +252,6 @@ async function filter<S extends Schema>(values: any[], filters: Filter<S>): Prom
   return await propertyFilter(values, <Partial<S>>filters);
 }
 
-
 export function getConnector<S extends Schema>(): Connector<S> {
   return {
     query(model: ModelStatic<S>): Promise<ModelConstructor<S>[]> {
@@ -280,12 +279,7 @@ export function getConnector<S extends Schema>(): Connector<S> {
       throw 'not yet implemented';
     },
     execute(query: string, bindings: (BaseType | BaseType[])[]): Promise<any[]> {
-      throw 'not yet implemented';
+      return
     },
   };
-};
-
-private collection(model: ModelStatic<S>): S[] {
-  return this.storage[model.modelName] = this.storage[model.modelName] || [];
-}
 }
