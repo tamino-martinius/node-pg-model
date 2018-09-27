@@ -67,6 +67,26 @@ async function inFilter<S extends Schema>(values: any[], filters: Partial<Filter
 }
 
 async function specialFilter<S extends Schema>(values: any[], filter: FilterSpecial<S>): Promise<string> {
+async function notInFilter<S extends Schema>(values: any[], filters: Partial<FilterIn<S>>) {
+  let query = '(1 = 1)';
+  const queryParts: string[] = [];
+  for (const column in filters) {
+    const filterValues = filters[column];
+    if (Array.isArray(filterValues) && filterValues.length > 0) {
+      const placeholders: string[] = [];
+      for (const filterValue of filterValues) {
+        values.push(filterValue);
+        placeholders.push(`$${values.length}`);
+      }
+      queryParts.push(`("${column}" NOT IN (${placeholders.join(', ')}))`);
+    }
+  }
+  if (queryParts.length > 0) {
+    query = queryParts.join(' AND ');
+  }
+  return query;
+}
+
   if (Object.keys(filter).length !== 1) throw '[TODO] Return proper error';
   if (filter.$and !== undefined)
     return await andFilter(values, filter.$and);
