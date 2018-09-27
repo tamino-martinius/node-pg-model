@@ -24,7 +24,7 @@ export type FilterBetween<S extends Schema> = {
 };
 
 export interface FilterRaw {
-  $bindings: (BaseType | BaseType[])[];
+  $bindings: BaseType[];
   $query: string;
 }
 
