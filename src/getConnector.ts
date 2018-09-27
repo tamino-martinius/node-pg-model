@@ -11,8 +11,8 @@ import {
   FilterRaw,
 } from './types';
 
-async function propertyFilter<S extends Schema>(values: any[], filters: Partial<S>): Promise<string> {
-  let queryParts: string[] = [];
+async function propertyFilter<S extends Schema>(values: any[], filters: Partial<S>) {
+  const queryParts: string[] = [];
   let query = '(1 = 1)';
   if (Object.keys(filters).length > 0) {
     for (const column in filters) {
@@ -22,25 +22,25 @@ async function propertyFilter<S extends Schema>(values: any[], filters: Partial<
     query = queryParts.join(' AND ');
   }
   return query;
-};
+}
 
-async function andFilter<S extends Schema>(values: any[], filters: Filter<S>[]): Promise<string> {
+async function andFilter<S extends Schema>(values: any[], filters: Filter<S>[]) {
   let query = '(1 = 1)';
   if (filters.length > 0) {
     const queryParts = await Promise.all(filters.map(filterItem => filter(values, filterItem)));
     query = queryParts.join(' AND ');
   }
   return query;
-};
+}
 
-async function orFilter<S extends Schema>(values: any[], filters: Filter<S>[]): Promise<string> {
+async function orFilter<S extends Schema>(values: any[], filters: Filter<S>[]) {
   let query = '(1 = 1)';
   if (filters.length > 0) {
     const queryParts = await Promise.all(filters.map(filterItem => filter(values, filterItem)));
     query = queryParts.join(' OR ');
   }
   return query;
-};
+}
 
 async function notFilter<S extends Schema>(values: any[], filters: Filter<S>): Promise<string> {
   return `(NOT (${await filter(values, filters)}))`;
