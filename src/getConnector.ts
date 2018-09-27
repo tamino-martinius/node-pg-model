@@ -181,6 +181,15 @@ async function lteFilter<S extends Schema>(values: any[], filters: Partial<S>) {
   return query;
 }
 
+async function rawFilter(values: any[], filters: FilterRaw) {
+  let query = filters.$query;
+  for (let index = filters.$bindings.length; index > 0; index -= 1) {
+    values.push(filters.$bindings[index - 1]);
+    query = query.replace(`$${index}`, `$${values.length}`)
+  }
+  return query;
+}
+
   if (Object.keys(filter).length !== 1) throw '[TODO] Return proper error';
   if (filter.$and !== undefined)
     return await andFilter(values, filter.$and);
