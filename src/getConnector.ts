@@ -129,6 +129,19 @@ async function notBetweenFilter<S extends Schema>(
   return query;
 }
 
+async function gtFilter<S extends Schema>(values: any[], filters: Partial<S>) {
+  const queryParts: string[] = [];
+  let query = '(1 = 1)';
+  if (Object.keys(filters).length > 0) {
+    for (const column in filters) {
+      values.push(filters[column]);
+      queryParts.push(`("${column}" > $${values.length})`);
+    }
+    query = queryParts.join(' AND ');
+  }
+  return query;
+}
+
   if (Object.keys(filter).length !== 1) throw '[TODO] Return proper error';
   if (filter.$and !== undefined)
     return await andFilter(values, filter.$and);
