@@ -91,6 +91,10 @@ async function nullFilter<S extends Schema>(_: any[], column: keyof S) {
   return `("${column}" IS NULL)`;
 }
 
+async function notNullFilter<S extends Schema>(_: any[], column: keyof S) {
+  return `("${column}" IS NOT NULL)`;
+}
+
   if (Object.keys(filter).length !== 1) throw '[TODO] Return proper error';
   if (filter.$and !== undefined)
     return await andFilter(values, filter.$and);
