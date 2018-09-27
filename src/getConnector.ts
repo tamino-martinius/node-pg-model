@@ -5,7 +5,10 @@ import {
   Connector,
   BaseType,
   Filter,
+  FilterIn,
+  FilterBetween,
   FilterSpecial,
+  FilterRaw,
 } from './types';
 
 async function propertyFilter<S extends Schema>(values: any[], filters: Partial<S>): Promise<string> {
