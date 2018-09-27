@@ -1,4 +1,5 @@
 import { Column } from './column';
+import { Pool } from 'pg';
 
 export interface Dict<T> {
   [key: string]: T;
@@ -112,6 +113,7 @@ export interface Connector<S extends Schema> {
 }
 
 export interface ModelStatic<S extends Schema> extends Function {
+  readonly pool: Pool;
   readonly tableName: string;
   readonly identifier: keyof S;
   readonly columns: Columns<S>;

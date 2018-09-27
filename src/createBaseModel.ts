@@ -26,9 +26,14 @@ import {
   Instance,
 } from './Instance';
 
+import {
+  Pool,
+} from 'pg';
+
 export function createBaseModel<S extends Schema>(): ModelStatic<S> {
   @staticImplements<ModelStatic<S>>()
   class Class {
+    static pool = new Pool();
     static tableName = '';
     static identifier: keyof S = '';
     static columns: Columns<S> = {};
