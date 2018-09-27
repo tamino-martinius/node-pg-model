@@ -190,6 +190,10 @@ async function rawFilter(values: any[], filters: FilterRaw) {
   return query;
 }
 
+async function asyncFilter<S extends Schema>(values: any[], filters: Promise<Filter<S>>) {
+  return filter(values, await filters);
+}
+
   if (Object.keys(filter).length !== 1) throw '[TODO] Return proper error';
   if (filter.$and !== undefined)
     return await andFilter(values, filter.$and);
