@@ -111,6 +111,24 @@ async function betweenFilter<S extends Schema>(values: any[], filters: Partial<F
   return query;
 }
 
+async function notBetweenFilter<S extends Schema>(
+  values: any[], filters: Partial<FilterBetween<S>>
+) {
+  let query = '(1 = 1)';
+  const queryParts: string[] = [];
+  for (const column in filters) {
+    const filterValues = filters[column];
+    if (filterValues !== undefined) {
+      values.push(filterValues.from, filterValues.to);
+      queryParts.push(`("${column}" NOT BETWEEN $${values.length - 1} AND $${values.length})`);
+    }
+  }
+  if (queryParts.length > 0) {
+    query = queryParts.join(' AND ');
+  }
+  return query;
+}
+
   if (Object.keys(filter).length !== 1) throw '[TODO] Return proper error';
   if (filter.$and !== undefined)
     return await andFilter(values, filter.$and);
