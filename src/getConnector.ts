@@ -318,6 +318,10 @@ async function getOffset<S extends Schema>(model: ModelStatic<S>) {
   return model.skip ? `OFFSET ${model.skip}` : '';
 }
 
+async function getReturning<S extends Schema>(model: ModelStatic<S>) {
+  return `RETURNING "${model.tableName}"."${model.identifier}"`;
+}
+
 export function getConnector<S extends Schema>(): Connector<S> {
   return {
     async query(model: ModelStatic<S>): Promise<ModelConstructor<S>[]> {
