@@ -277,9 +277,6 @@ export function createBaseModel<S extends Schema>(): ModelStatic<S> {
     }
 
     reload(): Promise<Class | undefined> {
-      const identifier = this.model.identifier;
-      const query = { [identifier]: (<Partial<S>><any>this)[identifier] };
-      return this.model.limitBy(1).unfiltered.filterBy(query).first;
       return this.model.first;
     }
   }
