@@ -193,6 +193,7 @@ export interface ModelConstructor<S extends Schema> {
   readonly isPersistent: boolean;
   readonly isChanged: boolean;
   readonly changes: Partial<Changes<S>>;
+  readonly changeSet: Partial<S>;
 
   getTyped<
     M extends ModelStatic<S>,

@@ -242,6 +242,17 @@ export function createBaseModel<S extends Schema>(): ModelStatic<S> {
       return changes;
     }
 
+    get changeSet(): Partial<S> {
+      const attributes = this.attributes;
+      const changes: Partial<S> = {};
+      for (const key in this.model.columns) {
+        if (attributes[key] !== this.persistentAttributes[key]) {
+          changes[key] = attributes[key];
+        }
+      }
+      return changes;
+    }
+
     getTyped<M extends ModelStatic<S>, I extends ModelConstructor<S>>(): Instance<S, M, I> {
       return new Instance<S, M, I>(<any>this);
     }
