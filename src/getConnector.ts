@@ -342,8 +342,17 @@ ${getOffset(model)}
       const { rows } = await model.pool.query(queryText, values);
       return rows;
     },
-    updateAll(model: ModelStatic<S>, attrs: Partial<S>): Promise<number> {
-      throw 'not yet implemented';
+    async updateAll(model: ModelStatic<S>, attrs: Partial<S>): Promise<number> {
+      const values: any[] = [];
+      const queryText = `
+${getUpdate(model)}
+${getSet(model, values, attrs)}
+${getWhere(model, values)}
+${getLimit(model)}
+${getOffset(model)}
+`;
+      const { rowCount } = await model.pool.query(queryText, values);
+      return rowCount;
     },
     deleteAll(model: ModelStatic<S>): Promise<number> {
       throw 'not yet implemented';
