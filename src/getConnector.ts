@@ -383,8 +383,18 @@ ${getOffset(model)}
       instance.persistentAttributes = instance.attributes;
       return instance;
     },
-    delete(instance: ModelConstructor<S>): Promise<ModelConstructor<S>> {
-      throw 'not yet implemented';
+    async delete(instance: ModelConstructor<S>): Promise<ModelConstructor<S>> {
+      const model = instance.model;
+      const values: any[] = [];
+      const queryText = `
+DELETE ${getFrom(model)}
+${getWhere(model, values)}
+${getLimit(model)}
+${getOffset(model)}
+`;
+      await model.pool.query(queryText, values);
+      (<any>instance)[model.identifier] = undefined;
+      return instance;
     },
     execute(query: string, bindings: (BaseType | BaseType[])[]): Promise<any[]> {
       return
