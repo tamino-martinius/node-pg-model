@@ -295,6 +295,9 @@ async function getWhere<S extends Schema>(model: ModelStatic<S>, values: any[]) 
 async function getLimit<S extends Schema>(model: ModelStatic<S>) {
   return model.limit ? `LIMIT ${model.limit}` : '';
 }
+
+async function getOffset<S extends Schema>(model: ModelStatic<S>) {
+  return model.skip ? `OFFSET ${model.skip}` : '';
 }
 
 export function getConnector<S extends Schema>(): Connector<S> {
