@@ -268,6 +268,13 @@ async function getSet<S extends Schema>(
   }
   return queryParts.join(', ');
 }
+
+async function getSelect<S extends Schema>(
+  model: ModelStatic<S>,
+  columns: string[] = Object.keys(model.columns).map(column => `"${model.tableName}"."${column}"`),
+) {
+  return `SELECT ${columns.join(', ')}`;
+}
 }
 
 export function getConnector<S extends Schema>(): Connector<S> {
