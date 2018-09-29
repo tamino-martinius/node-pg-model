@@ -368,8 +368,20 @@ ${getOffset(model)}
     create(instance: ModelConstructor<S>): Promise<ModelConstructor<S>> {
       throw 'not yet implemented';
     },
-    update(instance: ModelConstructor<S>): Promise<ModelConstructor<S>> {
-      throw 'not yet implemented';
+    async update(instance: ModelConstructor<S>): Promise<ModelConstructor<S>> {
+      const model = instance.model;
+      const values: any[] = [];
+      const attrs: Partial<S> = {};
+      const queryText = `
+${getUpdate(model)}
+${getSet(model, values, attrs)}
+${getWhere(model, values)}
+${getLimit(model)}
+${getOffset(model)}
+`;
+      await model.pool.query(queryText, values);
+      instance.persistentAttributes = instance.attributes;
+      return instance;
     },
     delete(instance: ModelConstructor<S>): Promise<ModelConstructor<S>> {
       throw 'not yet implemented';
