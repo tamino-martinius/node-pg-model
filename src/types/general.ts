@@ -103,7 +103,7 @@ export type Changes<S extends Schema> = {
 export interface Connector<S extends Schema> {
   query(model: ModelStatic<S>): Promise<ModelConstructor<S>[]>;
   count(model: ModelStatic<S>): Promise<number>;
-  select(model: ModelStatic<S>, keys: (keyof S)[]): Promise<S[keyof S][][]>;
+  select(model: ModelStatic<S>, columns: string[]): Promise<any[]>;
   updateAll(model: ModelStatic<S>, attrs: Partial<S>): Promise<number>;
   deleteAll(model: ModelStatic<S>): Promise<number>;
   create(instance: ModelConstructor<S>): Promise<ModelConstructor<S>>;
@@ -137,8 +137,8 @@ export interface ModelStatic<S extends Schema> extends Function {
   readonly unfiltered: ModelStatic<S>;
   readonly queryBy: QueryBy<S>;
   readonly all: Promise<ModelConstructor<S>[]>;
-  pluck(key: keyof S): Promise<S[keyof S][]>;
-  select(keys: (keyof S)[]): Promise<S[keyof S][][]>;
+  pluck(column: string): Promise<any[]>;
+  select(columns: string[]): Promise<Dict<any>[]>;
   updateAll(attrs: Partial<S>): Promise<ModelStatic<S>>;
   deleteAll(): Promise<ModelStatic<S>>;
   inBatchesOf(amount: number): Promise<Promise<ModelConstructor<S>[]>[]>;
@@ -172,8 +172,8 @@ export abstract class ModelStaticClass<
   abstract readonly queryBy: QueryByModel<S, M>;
   abstract readonly unfiltered: M;
   abstract readonly all: Promise<I[]>;
-  abstract pluck(key: keyof S): Promise<S[keyof S][]>;
-  abstract select(keys: (keyof S)[]): Promise<S[keyof S][][]>;
+  abstract pluck(column: string): Promise<any[]>;
+  abstract select(columns: string[]): Promise<Dict<any>[]>;
   abstract updateAll(attrs: Partial<S>): Promise<M>;
   abstract deleteAll(): Promise<I>;
   abstract inBatchesOf(amount: number): Promise<Promise<I[]>[]>;
