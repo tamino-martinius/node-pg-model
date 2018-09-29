@@ -7,6 +7,7 @@ import {
   Order,
   QueryByModel,
   FindByModel,
+  Dict,
 } from './types';
 
 export class Model<
@@ -62,12 +63,12 @@ export class Model<
     return <any>this.model.all;
   }
 
-  pluck(key: keyof S): Promise<S[keyof S][]> {
-    return this.model.pluck(key);
+  pluck(column: string): Promise<any[]> {
+    return this.model.pluck(column);
   }
 
-  select(keys: (keyof S)[]): Promise<S[keyof S][][]> {
-    return this.model.select(keys);
+  select(columns: string[]): Promise<Dict<any>[]> {
+    return this.model.select(columns);
   }
 
   updateAll(attrs: Partial<S>): Promise<M> {

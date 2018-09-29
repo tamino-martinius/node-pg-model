@@ -7,6 +7,7 @@ import {
   Filter,
   Changes,
   Order,
+  Dict,
   Columns,
 } from './types';
 
@@ -178,12 +179,12 @@ export function createBaseModel<S extends Schema>(): ModelStatic<S> {
       return this.connector.count(this);
     }
 
-    static async pluck(key: keyof S): Promise<S[keyof S][]> {
-      return (await this.select([key])).map(items => items[0]);
+    static async pluck(column: string): Promise<any[]> {
+      return (await this.select([column])).map(items => items[0]);
     }
 
-    static select(keys: (keyof S)[]): Promise<S[keyof S][][]> {
-      return this.connector.select(this, keys);
+    static select(columns: string[]): Promise<Dict<any>[]> {
+      return this.connector.select(this, columns);
     }
 
     constructor(_?: Partial<S>) {
@@ -272,6 +273,7 @@ export function createBaseModel<S extends Schema>(): ModelStatic<S> {
       const identifier = this.model.identifier;
       const query = { [identifier]: (<Partial<S>><any>this)[identifier] };
       return this.model.limitBy(1).unfiltered.filterBy(query).first;
+      return this.model.first;
     }
   }
 
