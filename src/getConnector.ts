@@ -354,8 +354,16 @@ ${getOffset(model)}
       const { rowCount } = await model.pool.query(queryText, values);
       return rowCount;
     },
-    deleteAll(model: ModelStatic<S>): Promise<number> {
-      throw 'not yet implemented';
+    async deleteAll(model: ModelStatic<S>): Promise<number> {
+      const values: any[] = [];
+      const queryText = `
+DELETE ${getFrom(model)}
+${getWhere(model, values)}
+${getLimit(model)}
+${getOffset(model)}
+`;
+      const { rowCount } = await model.pool.query(queryText, values);
+      return rowCount;
     },
     create(instance: ModelConstructor<S>): Promise<ModelConstructor<S>> {
       throw 'not yet implemented';
