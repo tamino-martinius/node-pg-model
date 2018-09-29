@@ -291,6 +291,10 @@ async function getWhere<S extends Schema>(model: ModelStatic<S>, values: any[]) 
   }
   return '';
 }
+
+async function getLimit<S extends Schema>(model: ModelStatic<S>) {
+  return model.limit ? `LIMIT ${model.limit}` : '';
+}
 }
 
 export function getConnector<S extends Schema>(): Connector<S> {
