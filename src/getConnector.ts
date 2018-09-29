@@ -275,6 +275,10 @@ async function getSelect<S extends Schema>(
 ) {
   return `SELECT ${columns.join(', ')}`;
 }
+
+async function getFrom<S extends Schema>(model: ModelStatic<S>) {
+  return `FROM "${model.tableName}"`;
+}
 }
 
 export function getConnector<S extends Schema>(): Connector<S> {
