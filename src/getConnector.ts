@@ -387,8 +387,17 @@ ${getOffset(model)}
       const { rowCount } = await model.pool.query(queryText, values);
       return rowCount;
     },
-    create(instance: ModelConstructor<S>): Promise<ModelConstructor<S>> {
-      throw 'not yet implemented';
+    async create(instance: ModelConstructor<S>): Promise<ModelConstructor<S>> {
+      const model = instance.model;
+      const values: any[] = [];
+      const queryText = `
+${getInsert(model, values, instance.attributes)}
+${getReturning(model)}
+`;
+      const { rows } = await model.pool.query(queryText, values);
+      (<any>instance)[model.identifier] = rows[0][model.identifier];
+      instance.persistentAttributes = instance.attributes;
+      return instance;
     },
     async update(instance: ModelConstructor<S>): Promise<ModelConstructor<S>> {
       const model = instance.model;
