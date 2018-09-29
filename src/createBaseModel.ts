@@ -199,7 +199,14 @@ export function createBaseModel<S extends Schema>(): ModelStatic<S> {
     }
 
     get model(): typeof Class {
-      return <typeof Class>this.constructor;
+      const constructor: typeof Class = <any>this.constructor;
+      const identifier = constructor.identifier;
+      const query = { [identifier]: (<Partial<S>><any>this)[identifier] };
+      return class extends constructor {
+        static filter: Filter<S> = query;
+        static limit: number | undefined = undefined;
+        static skip: number | undefined = undefined;
+      };
     }
 
     get attributes(): Partial<S> {
