@@ -245,12 +245,16 @@ async function specialFilter<S extends Schema>(values: any[], filter: FilterSpec
 }
 
 async function filter<S extends Schema>(values: any[], filters: Filter<S>): Promise<string> {
-  for (const key in filters) {
-    if (key.startsWith('$')) {
-      return await specialFilter(values, <FilterSpecial<S>>filters);
+  if (Object.keys(filters).length > 0) {
+    for (const key in filters) {
+      if (key.startsWith('$')) {
+        return await specialFilter(values, <FilterSpecial<S>>filters);
+      }
     }
+    return await propertyFilter(values, <Partial<S>>filters);
   }
-  return await propertyFilter(values, <Partial<S>>filters);
+  return '';
+}
 }
 
 export function getConnector<S extends Schema>(): Connector<S> {
