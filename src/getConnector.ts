@@ -279,6 +279,10 @@ async function getSelect<S extends Schema>(
 async function getFrom<S extends Schema>(model: ModelStatic<S>) {
   return `FROM "${model.tableName}"`;
 }
+
+async function getUpdate<S extends Schema>(model: ModelStatic<S>) {
+  return `UPDATE "${model.tableName}"`;
+}
 }
 
 export function getConnector<S extends Schema>(): Connector<S> {
