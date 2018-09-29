@@ -371,10 +371,9 @@ ${getOffset(model)}
     async update(instance: ModelConstructor<S>): Promise<ModelConstructor<S>> {
       const model = instance.model;
       const values: any[] = [];
-      const attrs: Partial<S> = {};
       const queryText = `
 ${getUpdate(model)}
-${getSet(model, values, attrs)}
+${getSet(model, values, instance.changeSet)}
 ${getWhere(model, values)}
 ${getLimit(model)}
 ${getOffset(model)}
