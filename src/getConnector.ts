@@ -266,7 +266,7 @@ async function getSet<S extends Schema>(
     values.push(attrs[column]);
     queryParts.push(`"${model.tableName}"."${column}" = $${values.length}`);
   }
-  return queryParts.join(', ');
+  return `SET ${queryParts.join(', ')}`;
 }
 
 async function getSelect<S extends Schema>(
