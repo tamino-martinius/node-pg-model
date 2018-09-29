@@ -17,7 +17,7 @@ async function propertyFilter<S extends Schema>(values: any[], filters: Partial<
   if (Object.keys(filters).length > 0) {
     for (const column in filters) {
       values.push(filters[column]);
-      queryParts.push(`("${column}" = $${values.length})`);
+      queryParts.push(`("$TABLE"."${column}" = $${values.length})`);
     }
     query = queryParts.join(' AND ');
   }
@@ -57,7 +57,7 @@ async function inFilter<S extends Schema>(values: any[], filters: Partial<Filter
         values.push(filterValue);
         placeholders.push(`$${values.length}`);
       }
-      queryParts.push(`("${column}" IN (${placeholders.join(', ')}))`);
+      queryParts.push(`("$TABLE"."${column}" IN (${placeholders.join(', ')}))`);
     }
   }
   if (queryParts.length > 0) {
@@ -77,7 +77,7 @@ async function notInFilter<S extends Schema>(values: any[], filters: Partial<Fil
         values.push(filterValue);
         placeholders.push(`$${values.length}`);
       }
-      queryParts.push(`("${column}" NOT IN (${placeholders.join(', ')}))`);
+      queryParts.push(`("$TABLE"."${column}" NOT IN (${placeholders.join(', ')}))`);
     }
   }
   if (queryParts.length > 0) {
@@ -87,11 +87,11 @@ async function notInFilter<S extends Schema>(values: any[], filters: Partial<Fil
 }
 
 async function nullFilter<S extends Schema>(_: any[], column: keyof S) {
-  return `("${column}" IS NULL)`;
+  return `("$TABLE"."${column}" IS NULL)`;
 }
 
 async function notNullFilter<S extends Schema>(_: any[], column: keyof S) {
-  return `("${column}" IS NOT NULL)`;
+  return `("$TABLE"."${column}" IS NOT NULL)`;
 }
 
 async function betweenFilter<S extends Schema>(values: any[], filters: Partial<FilterBetween<S>>) {
@@ -101,7 +101,7 @@ async function betweenFilter<S extends Schema>(values: any[], filters: Partial<F
     const filterValues = filters[column];
     if (filterValues !== undefined) {
       values.push(filterValues.from, filterValues.to);
-      queryParts.push(`("${column}" BETWEEN $${values.length - 1} AND $${values.length})`);
+      queryParts.push(`("$TABLE"."${column}" BETWEEN $${values.length - 1} AND $${values.length})`);
     }
   }
   if (queryParts.length > 0) {
@@ -119,7 +119,8 @@ async function notBetweenFilter<S extends Schema>(
     const filterValues = filters[column];
     if (filterValues !== undefined) {
       values.push(filterValues.from, filterValues.to);
-      queryParts.push(`("${column}" NOT BETWEEN $${values.length - 1} AND $${values.length})`);
+      const index = values.length;
+      queryParts.push(`("$TABLE"."${column}" NOT BETWEEN $${index - 1} AND $${index})`);
     }
   }
   if (queryParts.length > 0) {
@@ -134,7 +135,7 @@ async function gtFilter<S extends Schema>(values: any[], filters: Partial<S>) {
   if (Object.keys(filters).length > 0) {
     for (const column in filters) {
       values.push(filters[column]);
-      queryParts.push(`("${column}" > $${values.length})`);
+      queryParts.push(`("$TABLE"."${column}" > $${values.length})`);
     }
     query = queryParts.join(' AND ');
   }
@@ -147,7 +148,7 @@ async function gteFilter<S extends Schema>(values: any[], filters: Partial<S>) {
   if (Object.keys(filters).length > 0) {
     for (const column in filters) {
       values.push(filters[column]);
-      queryParts.push(`("${column}" >= $${values.length})`);
+      queryParts.push(`("$TABLE"."${column}" >= $${values.length})`);
     }
     query = queryParts.join(' AND ');
   }
@@ -160,7 +161,7 @@ async function ltFilter<S extends Schema>(values: any[], filters: Partial<S>) {
   if (Object.keys(filters).length > 0) {
     for (const column in filters) {
       values.push(filters[column]);
-      queryParts.push(`("${column}" < $${values.length})`);
+      queryParts.push(`("$TABLE"."${column}" < $${values.length})`);
     }
     query = queryParts.join(' AND ');
   }
@@ -173,7 +174,7 @@ async function lteFilter<S extends Schema>(values: any[], filters: Partial<S>) {
   if (Object.keys(filters).length > 0) {
     for (const column in filters) {
       values.push(filters[column]);
-      queryParts.push(`("${column}" <= $${values.length})`);
+      queryParts.push(`("$TABLE"."${column}" <= $${values.length})`);
     }
     query = queryParts.join(' AND ');
   }
