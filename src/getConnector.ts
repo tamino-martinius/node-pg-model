@@ -318,8 +318,17 @@ ${getOffset(model)}
         return instance;
       });
     },
-    count(model: ModelStatic<S>): Promise<number> {
-      throw 'not yet implemented';
+    async count(model: ModelStatic<S>): Promise<number> {
+      const values: any[] = [];
+      const queryText = `
+${getSelect(model, [`COUNT("${model.tableName}"."${model.identifier}") AS count`])}
+${getFrom(model)}
+${getWhere(model, values)}
+${getLimit(model)}
+${getOffset(model)}
+`;
+      const { rows } = await model.pool.query(queryText, values);
+      return rows[0].count;
     },
     select(model: ModelStatic<S>, keys: (keyof S)[]): Promise<S[keyof S][][]> {
       throw 'not yet implemented';
