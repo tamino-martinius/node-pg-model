@@ -283,6 +283,14 @@ async function getFrom<S extends Schema>(model: ModelStatic<S>) {
 async function getUpdate<S extends Schema>(model: ModelStatic<S>) {
   return `UPDATE "${model.tableName}"`;
 }
+
+async function getWhere<S extends Schema>(model: ModelStatic<S>, values: any[]) {
+  const conditions = await filter(values, model.filter);
+  if (conditions.length > 0) {
+    return `WHERE ${conditions.replace(/\$TABLE/g, model.tableName)}`;
+  }
+  return '';
+}
 }
 
 export function getConnector<S extends Schema>(): Connector<S> {
