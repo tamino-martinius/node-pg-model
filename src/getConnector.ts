@@ -255,6 +255,19 @@ async function filter<S extends Schema>(values: any[], filters: Filter<S>): Prom
   }
   return '';
 }
+
+async function getSet<S extends Schema>(
+  model: ModelStatic<S>,
+  values: any[],
+  attrs: Partial<S>,
+): Promise<string> {
+  const queryParts: string[] = [];
+  for (const column in attrs) {
+    values.push(attrs[column]);
+    queryParts.push(`"${model.tableName}"."${column}" = $${values.length}`);
+  }
+  return queryParts.join(', ');
+}
 }
 
 export function getConnector<S extends Schema>(): Connector<S> {
