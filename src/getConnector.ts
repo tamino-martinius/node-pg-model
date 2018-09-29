@@ -302,8 +302,21 @@ async function getOffset<S extends Schema>(model: ModelStatic<S>) {
 
 export function getConnector<S extends Schema>(): Connector<S> {
   return {
-    query(model: ModelStatic<S>): Promise<ModelConstructor<S>[]> {
-      throw 'not yet implemented';
+    async query(model: ModelStatic<S>): Promise<ModelConstructor<S>[]> {
+      const values: any[] = [];
+      const queryText = `
+${getSelect(model)}
+${getFrom(model)}
+${getWhere(model, values)}
+${getLimit(model)}
+${getOffset(model)}
+`;
+      const { rows } = await model.pool.query(queryText, values);
+      return rows.map((row) => {
+        const instance = new model(row);
+        instance.persistentAttributes = instance.attributes;
+        return instance;
+      });
     },
     count(model: ModelStatic<S>): Promise<number> {
       throw 'not yet implemented';
