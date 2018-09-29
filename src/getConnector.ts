@@ -269,6 +269,24 @@ async function getSet<S extends Schema>(
   return `SET ${queryParts.join(', ')}`;
 }
 
+async function getInsert<S extends Schema>(
+  model: ModelStatic<S>,
+  values: any[],
+  attrs: Partial<S>,
+): Promise<string> {
+  const insertColumns: string[] = [];
+  const insertValues: string[] = [];
+  for (const column in attrs) {
+    if (column !== model.identifier) {
+      values.push(attrs[column]);
+      insertColumns.push(`"${model.tableName}"."${column}"`);
+      insertValues.push(`$${values.length}`);
+    }
+  }
+  return `INSERT INTO "${model.tableName}" (${insertColumns.join(', ')})
+VALUES (${insertValues.join(', ')})`;
+}
+
 async function getSelect<S extends Schema>(
   model: ModelStatic<S>,
   columns: string[] = Object.keys(model.columns).map(column => `"${model.tableName}"."${column}"`),
