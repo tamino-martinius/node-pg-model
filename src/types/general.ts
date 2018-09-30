@@ -117,6 +117,7 @@ export interface ModelStatic<S extends Schema> extends Function {
   readonly tableName: string;
   readonly identifier: keyof S;
   readonly columns: Columns<S>;
+  readonly columnNames: Dict<string>;
   readonly filter: Filter<S>;
   readonly limit: number | undefined;
   readonly skip: number | undefined;
