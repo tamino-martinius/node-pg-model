@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2015",
     "module": "CommonJS",
     "moduleResolution": "node",
     "sourceMap": true,
@@ -20,8 +20,7 @@
   },
   "files": [
     "node_modules/typescript/lib/lib.es2015.d.ts",
-    "node_modules/typescript/lib/lib.dom.d.ts",
-    "src/next_model.ts"
+    "src/index.ts"
   ],
   "include": [
     "*.ts",
