@@ -103,7 +103,7 @@ export type Changes<S extends Schema> = {
 export interface Connector<S extends Schema> {
   query(model: ModelStatic<S>): Promise<ModelConstructor<S>[]>;
   count(model: ModelStatic<S>): Promise<number>;
-  select(model: ModelStatic<S>, columns: string[]): Promise<any[]>;
+  select(model: ModelStatic<S>, columns: string[]): Promise<Dict<any>[]>;
   updateAll(model: ModelStatic<S>, attrs: Partial<S>): Promise<number>;
   deleteAll(model: ModelStatic<S>): Promise<number>;
   create(instance: ModelConstructor<S>): Promise<ModelConstructor<S>>;
