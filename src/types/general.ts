@@ -109,7 +109,7 @@ export interface Connector<S extends Schema> {
   create(instance: ModelConstructor<S>): Promise<ModelConstructor<S>>;
   update(instance: ModelConstructor<S>): Promise<ModelConstructor<S>>;
   delete(instance: ModelConstructor<S>): Promise<ModelConstructor<S>>;
-  execute(query: string, bindings: (BaseType | BaseType[])[]): Promise<any[]>;
+  execute(model: ModelStatic<S>, query: string, bindings: BaseType[]): Promise<Dict<any>[]>;
 }
 
 export interface ModelStatic<S extends Schema> extends Function {
