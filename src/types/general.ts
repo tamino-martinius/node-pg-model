@@ -61,19 +61,19 @@ export enum Direction {
   Desc = 'DESC',
 }
 
-export type Order<S extends Schema> = {
-  [K in keyof S]: Direction;
-};
-
 // "{ new(): T }"
 // is from https://www.typescriptlang.org/docs/handbook/generics.html#using-class-types-in-generics
 export interface Constructor<M> {
   new(...args: any[]): M;
 }
 
-export type Columns<S extends Schema> = Partial<{
-  [K in keyof S]: Column;
-}>;
+export type SchemaMapping<S extends Schema, T> = {
+  [K in keyof S]: T;
+};
+
+export type Columns<S extends Schema> = Partial<SchemaMapping<S, Column>>;
+export type Order<S extends Schema> = Partial<SchemaMapping<S, Direction>>;
+export type ColumnMapping = Dict<string>;
 
 export type QueryBy<S extends Schema> = {
   [P in keyof S]: (value: S[P] | S[P][]) => ModelStatic<S>;
