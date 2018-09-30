@@ -9,6 +9,7 @@ import {
   Order,
   Dict,
   Columns,
+  BaseType,
 } from './types';
 
 import {
@@ -185,6 +186,10 @@ export function createBaseModel<S extends Schema>(): ModelStatic<S> {
 
     static select(columns: string[]): Promise<Dict<any>[]> {
       return this.connector.select(this, columns);
+    }
+
+    static execute(query: string, bindings: BaseType[]): Promise<Dict<any>[]> {
+      return this.connector.execute(this, query, bindings);
     }
 
     constructor(_?: Partial<S>) {
