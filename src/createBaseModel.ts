@@ -207,7 +207,10 @@ export function createBaseModel<S extends Schema>(): ModelStatic<S> {
       return this.connector.execute(this, query, bindings);
     }
 
-    constructor(_?: Partial<S>) {
+    constructor(attrs?: Partial<S>) {
+      if (attrs) {
+        this.assign(attrs);
+      }
     }
 
     static build(attrs?: Partial<S>): Class {
