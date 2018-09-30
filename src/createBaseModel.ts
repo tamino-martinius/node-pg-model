@@ -17,6 +17,7 @@ import {
 } from './getConnector';
 
 import {
+  camelToSnakeCase,
   staticImplements,
 } from './util';
 
@@ -35,6 +36,7 @@ import {
 export function createBaseModel<S extends Schema>(): ModelStatic<S> {
   @staticImplements<ModelStatic<S>>()
   class Class {
+    private static cachedColumnNames: Dict<string> | undefined;
     static pool = new Pool();
     static tableName = '';
     static identifier: keyof S = '';
@@ -52,6 +54,19 @@ export function createBaseModel<S extends Schema>(): ModelStatic<S> {
         keys.push(key);
       }
       return keys;
+    }
+
+    static get columnNames(): Dict<string> {
+      if (this.cachedColumnNames) {
+        return this.cachedColumnNames;
+      }
+      const columnNames: Dict<string> = {};
+      for (const column in this.columns) {
+        const pgColumnName = camelToSnakeCase(column);
+        columnNames[column] = pgColumnName;
+        columnNames[pgColumnName] = column;
+      }
+      return this.cachedColumnNames = columnNames;
     }
 
     static getTyped<M extends ModelStatic<S>, I extends ModelConstructor<S>>(): Model<S, M, I> {
