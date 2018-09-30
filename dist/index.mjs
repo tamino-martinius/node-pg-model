@@ -4,3 +4,4 @@ export * from './Instance';
 export * from './getConnector';
 export * from './createBaseModel';
 export * from './util';
+//# sourceMappingURL=index.mjs.map

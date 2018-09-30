@@ -1,17 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function applyMixins(derivedCtor, baseCtors) {
-    baseCtors.forEach(function (baseCtor) {
-        Object.getOwnPropertyNames(baseCtor.prototype).forEach(function (name) {
-            derivedCtor.prototype[name] = baseCtor.prototype[name];
-        });
-    });
-}
-exports.applyMixins = applyMixins;
-;
 function staticImplements() {
-    return function (_constructor) {
+    return (_) => {
     };
 }
 exports.staticImplements = staticImplements;
+function snakeToCamelCase(value) {
+    return value.replace(/_\w/g, m => m[1].toUpperCase());
+}
+exports.snakeToCamelCase = snakeToCamelCase;
+function camelToSnakeCase(value) {
+    return value.replace(/([A-Z])/g, m => `_${m.toLowerCase()}`);
+}
+exports.camelToSnakeCase = camelToSnakeCase;
 //# sourceMappingURL=util.js.map
