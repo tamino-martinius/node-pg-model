@@ -39,7 +39,7 @@ export function createBaseModel<S extends Schema>(): ModelStatic<S> {
     private static cachedColumnNames: Dict<string> | undefined;
     static pool = new Pool();
     static tableName = '';
-    static identifier: keyof S = '';
+    static identifier: keyof S = 'id';
     static columns: Columns<S> = {};
     static filter: Filter<S> = {};
     static limit: number | undefined = undefined;
