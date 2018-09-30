@@ -146,6 +146,7 @@ export interface ModelStatic<S extends Schema> extends Function {
   find(query: Filter<S>): Promise<undefined | ModelConstructor<S>>;
   readonly findBy: FindBy<S>;
   readonly count: Promise<number>;
+  execute(query: string, bindings: BaseType[]): Promise<Dict<any>[]>;
 
   new(attrs: Partial<S> | undefined): ModelConstructor<S>;
   build(attrs: Partial<S> | undefined): ModelConstructor<S>;
