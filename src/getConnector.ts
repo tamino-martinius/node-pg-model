@@ -9,6 +9,7 @@ import {
   FilterBetween,
   FilterSpecial,
   FilterRaw,
+  Dict,
 } from './types';
 
 async function propertyFilter<S extends Schema>(values: any[], filters: Partial<S>) {
@@ -426,8 +427,13 @@ ${getOffset(model)}
       (<any>instance)[model.identifier] = undefined;
       return instance;
     },
-    execute(query: string, bindings: (BaseType | BaseType[])[]): Promise<any[]> {
-      return
+    async execute(
+      model: ModelStatic<S>,
+      query: string,
+      bindings: BaseType[],
+    ): Promise<Dict<any>[]> {
+      const { rows } = await model.pool.query(query, bindings);
+      return rows;
     },
   };
 }
