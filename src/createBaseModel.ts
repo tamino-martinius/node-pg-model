@@ -238,11 +238,11 @@ export function createBaseModel<S extends Schema>(): ModelStatic<S> {
     }
 
     get isNew(): boolean {
-      return !this.isPersistent;
+      return !(<Partial<S>><any>this)[this.model.identifier];
     }
 
     get isPersistent(): boolean {
-      return !(<Partial<S>><any>this)[this.model.identifier];
+      return !this.isNew;
     }
 
     get isChanged(): boolean {
