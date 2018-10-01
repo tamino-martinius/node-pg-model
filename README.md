@@ -90,28 +90,59 @@ See [GitHub](https://github.com/tamino-martinius/node-pg-model/projects/1) proje
 
 To keep the configuration as short as possible, its recommended to use the following conventions:
 
-* Use camel case for multiple words
+* Every `column` key should be camelCased with lower case start.
   * `createdAt`
   * `someOtherValue`
-  * `ChatMessage`
-* Every property starts with lower case.
-  * `createdAt`
-  * `someOtherValue`
-* Classes should be singular start with an capital letter.
-  * `Address`
-  * `Chat`
-  * `ChatMessage`
-* Foreign keys are the class names starting with an lower case character and end with Id.
-  * `User` - `userId`
-  * `Chat` - `chatId`
-  * `ChatMessage` - `chatMessageId`
-* Every model has an `id` property. If needed you can add aliases for it.
+* `tableName` should be plural snake_cased.
+  * `addresses`
+  * `chat_messages`
+* Every model has an `identifier` column. The default is `id`.
 
 ## Example
 
 ~~~ts
-// import
-import NextModel from 'next-model';
+// Imports
+import {
+  createBaseModel,
+  Model,
+  Columns,
+  Instance,
+} from '@nextcode/pg-model';
+
+// Typings
+interface UserSchema {
+  id: number;
+  addressId: number;
+  firstName: string;
+  lastName: string;
+  gender: string;
+};
+
+class User extends createBaseModel<UserSchema>() implements UserSchema {
+  static pool = new Pool({ database: 'nextcode' });
+  id: number;
+  firstName: string;
+  lastName: string;
+
+  static tableName = 'users';
+  static columns: Columns<UserSchema> = {
+    id: { type: 'Serial' },
+    firstName: { type: 'CharVarying' },
+    lastName: { type: 'CharVarying' },
+  };
+
+  static get $(): Model<UserSchema, typeof User, User> {
+    return <any>this.getTyped();
+  }
+
+  get $(): Instance<UserSchema, typeof User, User> {
+    return <any>this.getTyped();
+  }
+
+  get addresses() {
+    return Address.$.queryBy.userId(this.id);
+  }
+}
 
 // Typings
 interface UserSchema {
@@ -128,36 +159,44 @@ interface AddressSchema {
 };
 
 // model definitions
-class User extends NextModel<UserSchema>() {
+class User extends createBaseModel<UserSchema>() implements UserSchema {
   id: number;
+  addressId: number;
   firstName: string;
   lastName: string;
   gender: string;
 
-  static get schema() {
-    return {
-      id: { type: 'integer' },
-      addressId: { type: 'integer' },
-      firstName: { type: 'string' },
-      lastName: { type: 'string' },
-      gender: { type: 'string' },
-    };
+  static tableName = 'users';
+  static columns: Columns<UserSchema> = {
+    id: { type: 'Serial' },
+    addressId: { type: 'Integer' },
+    firstName: { type: 'CharVarying' },
+    lastName: { type: 'CharVarying' },
+    gender: { type: 'CharVarying' },
+  };
+
+  static get $(): Model<UserSchema, typeof User, User> {
+    return <any>this.getTyped();
+  }
+
+  get $(): Instance<UserSchema, typeof User, User> {
+    return <any>this.getTyped();
   }
 
   static get males(): typeof User {
-    return this.queryBy.gender('male');
+    return this.$.queryBy.gender('male');
   }
 
   static get females(): typeof User {
-    return this.queryBy('female');
+    return this.$.queryBy.gender('female');
   }
 
   static withFirstName(firstName): typeof User {
-    return this.query({ firstName });
+    return this.$.query({ firstName });
   }
 
-  get addresses() {
-    return this.hasMany(Address);
+  get address() {
+    return Address.$.findBy.id(this.addressId);
   }
 
   get name(): string {
@@ -169,15 +208,14 @@ class Address extends NextModel<AddressSchema>() {
   id: number;
   street: string;
 
-  static get schema() {
-    return {
-      id: { type: 'integer' },
-      street: { type: 'string' },
-    };
-  }
+  static tableName = 'addresses';
+  static columns: Columns<AddressSchema> = {
+    id: { type: 'Serial' },
+    street: { type: 'CharVarying' },
+  };
 
-  get user() {
-    return this.belongsTo(User);
+  get users() {
+    return User.$.queryBy.addressId(this.id);
   }
 };
 
