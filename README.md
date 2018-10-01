@@ -6,15 +6,15 @@
 
 # Temporary Docs
 
-Rails like models using **TypeScript**. [![Build Status](https://travis-ci.org/tamino-martinius/node-pg-model.svg?branch=master)](https://travis-ci.org/tamino-martinius/node-pg-model)
+**Model layer** for Postgres using **TypeScript**. [![Build Status](https://travis-ci.org/tamino-martinius/node-pg-model.svg?branch=master)](https://travis-ci.org/tamino-martinius/node-pg-model)
 
-NextModel gives you the ability to:
+`pg-model` gives you the ability to:
 
 * Represent **models** and their data.
-* Represent **associations** between these models.
-* Represent **inheritance** hierarchies through related models.
-* Perform database operations in an **object-oriented** fashion.
+* Ability to write (strong typed) **queries**.
 * Uses **Promises** for database queries.
+* Perform database operations in an **object-oriented** fashion.
+* **No dependencies** are required (just pg package itself).
 
 ## Roadmap / Where can i contribute
 
