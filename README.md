@@ -23,18 +23,10 @@ See [GitHub](https://github.com/tamino-martinius/node-pg-model/projects/1) proje
 * Fix **typos**
 * Improve **documentation**
 * Implement **order** in `Connector`
-* `createdAt` and `updatedAt` **timestamps**
 * Add **callbacks**
-* Predefined **validations**
-* Improve **schema** with eg. default values, limits
-* Improve **associations** eg. cascading deletions
-* Add more packages for eg. **versioning** and **soft deleting**
+* Improve **columns** with eg. default values, limits
+* Add more packages for eg. **versioning**, **validations** and **soft deleting**
 * Help to improve **tests** and the test **coverage**.
-* Add more connectors for eg. **graphQL** and **dynamoDB**
-* `includes` prefetches relations with two db queries *(fetch records => pluck ids => fetch related records by ids)* instead of one query per related model.
-
-  `User.includes({address: {}})`, `Profile.includes({user: {address: {}}})`
-* Add a solution to create **Migrations**
 
 ## TOC
 
