@@ -22,6 +22,6 @@ export declare class Model<S extends Schema, M extends ModelStatic<S>, I extends
     find(query: Filter<S>): Promise<I | undefined>;
     readonly findBy: FindByModel<S, I>;
     readonly count: Promise<number>;
-    build(attrs: Partial<S> | undefined): I;
-    create(attrs: Partial<S> | undefined): Promise<I>;
+    build(attrs: S): I;
+    create(attrs: S): Promise<I>;
 }

@@ -24,9 +24,7 @@ function createBaseModel() {
     let Class = Class_1 = class Class {
         constructor(attrs) {
             this.persistentAttributes = {};
-            if (attrs) {
-                this.assign(attrs);
-            }
+            this.assign(attrs);
         }
         static get keys() {
             const keys = [];

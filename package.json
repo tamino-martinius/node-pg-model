@@ -1,6 +1,6 @@
 {
   "name": "@nextcode/pg-model",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "Postgres model layer package with zero dependencies",
   "keywords": [
     "model",
