@@ -99,11 +99,11 @@ export class Model<
     return this.model.count;
   }
 
-  build(attrs: Partial<S> | undefined): I {
+  build(attrs: S): I {
     return <any>this.model.build(attrs);
   }
 
-  create(attrs: Partial<S> | undefined): Promise<I> {
+  create(attrs: S): Promise<I> {
     return <any>this.model.create(attrs);
   }
 }
