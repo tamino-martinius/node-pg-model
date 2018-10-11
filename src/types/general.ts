@@ -149,9 +149,9 @@ export interface ModelStatic<S extends Schema> extends Function {
   readonly count: Promise<number>;
   execute(query: string, bindings: BaseType[]): Promise<Dict<any>[]>;
 
-  new(attrs: Partial<S> | undefined): ModelConstructor<S>;
-  build(attrs: Partial<S> | undefined): ModelConstructor<S>;
-  create(attrs: Partial<S> | undefined): Promise<ModelConstructor<S>>;
+  new(attrs: S): ModelConstructor<S>;
+  build(attrs: S): ModelConstructor<S>;
+  create(attrs: S): Promise<ModelConstructor<S>>;
   // prototype: S;
 }
 
@@ -184,8 +184,8 @@ export abstract class ModelStaticClass<
   abstract readonly findBy: FindByModel<S, I>;
   abstract readonly count: Promise<number>;
 
-  abstract build(attrs: Partial<S> | undefined): I;
-  abstract create(attrs: Partial<S> | undefined): Promise<I>;
+  abstract build(attrs: S | undefined): I;
+  abstract create(attrs: S | undefined): Promise<I>;
 }
 
 export interface ModelConstructor<S extends Schema> {
