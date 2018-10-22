@@ -75,23 +75,13 @@ export type Columns<S extends Schema> = Partial<SchemaMapping<S, Column>>;
 export type Order<S extends Schema> = Partial<SchemaMapping<S, Direction>>;
 export type ColumnMapping = Dict<string>;
 
-export type QueryBy<S extends Schema> = {
-  [P in keyof S]: (value: S[P] | S[P][]) => ModelStatic<S>;
+export type QueryBy<T extends ModelClass<S>, S extends Schema> = {
+  [P in keyof S]: (value: S[P] | S[P][]) => T;
 };
 
-export type QueryByModel<S extends Schema, M extends ModelStatic<S>> = {
-  [P in keyof S]: (value: S[P] | S[P][]) => M;
+export type FindBy<T extends ModelInstance<S>, S extends Schema> = {
+  [P in keyof S]: (value: S[P] | S[P][]) => Promise<T | undefined>;
 };
-
-export type FindBy<S extends Schema> = {
-  [P in keyof S]: (value: S[P] | S[P][]) => Promise<undefined | ModelConstructor<S>>;
-};
-
-export type FindByModel<S extends Schema, I extends ModelConstructor<S>> = {
-  [P in keyof S]: (value: S[P] | S[P][]) => Promise<I | undefined>;
-};
-
-export type Find<S extends Schema> = (query: Filter<S>) => Promise<undefined | ModelConstructor<S>>;
 
 export type Changes<S extends Schema> = {
   [P in keyof S]: {
@@ -101,18 +91,18 @@ export type Changes<S extends Schema> = {
 };
 
 export interface Connector<S extends Schema> {
-  query(model: ModelStatic<S>): Promise<ModelConstructor<S>[]>;
-  count(model: ModelStatic<S>): Promise<number>;
-  select(model: ModelStatic<S>, columns: string[]): Promise<Dict<any>[]>;
-  updateAll(model: ModelStatic<S>, attrs: Partial<S>): Promise<number>;
-  deleteAll(model: ModelStatic<S>): Promise<number>;
-  create(instance: ModelConstructor<S>): Promise<ModelConstructor<S>>;
-  update(instance: ModelConstructor<S>): Promise<ModelConstructor<S>>;
-  delete(instance: ModelConstructor<S>): Promise<ModelConstructor<S>>;
-  execute(model: ModelStatic<S>, query: string, bindings: BaseType[]): Promise<Dict<any>[]>;
+  query(model: ModelClass<S>): Promise<ModelInstance<S>[]>;
+  count(model: ModelClass<S>): Promise<number>;
+  select(model: ModelClass<S>, columns: string[]): Promise<Dict<any>[]>;
+  updateAll(model: ModelClass<S>, attrs: Partial<S>): Promise<number>;
+  deleteAll(model: ModelClass<S>): Promise<number>;
+  create(instance: ModelInstance<S>): Promise<ModelInstance<S>>;
+  update(instance: ModelInstance<S>): Promise<ModelInstance<S>>;
+  delete(instance: ModelInstance<S>): Promise<ModelInstance<S>>;
+  execute(model: ModelClass<S>, query: string, bindings: BaseType[]): Promise<Dict<any>[]>;
 }
 
-export interface ModelStatic<S extends Schema> extends Function {
+export interface ModelClass<S extends Schema> extends Function {
   readonly pool: Pool;
   readonly tableName: string;
   readonly identifier: keyof S;
@@ -125,70 +115,34 @@ export interface ModelStatic<S extends Schema> extends Function {
   readonly keys: (keyof S)[];
   readonly connector: Connector<S>;
 
-  getTyped<M extends ModelStatic<S>, I extends ModelConstructor<S>>(): ModelStaticClass<S, M, I>;
-
-  limitBy(amount: number): ModelStatic<S>;
-  readonly unlimited: ModelStatic<S>;
-  skipBy(amount: number): ModelStatic<S>;
-  readonly unskipped: ModelStatic<S>;
-  orderBy(order: Partial<Order<S>>): ModelStatic<S>;
-  reorder(order: Partial<Order<S>>): ModelStatic<S>;
-  readonly unordered: ModelStatic<S>;
-  filterBy(filter: Filter<S>): ModelStatic<S>;
-  readonly unfiltered: ModelStatic<S>;
-  readonly queryBy: QueryBy<S>;
-  readonly all: Promise<ModelConstructor<S>[]>;
+  limitBy<T extends ModelClass<S>>(this: T, amount: number): T;
+  unlimited<T extends ModelClass<S>>(this: T): T;
+  skipBy<T extends ModelClass<S>>(this: T, amount: number): T;
+  unskipped<T extends ModelClass<S>>(this: T): T;
+  orderBy<T extends ModelClass<S>>(this: T, order: Partial<Order<S>>): T;
+  reorder<T extends ModelClass<S>>(this: T, order: Partial<Order<S>>): T;
+  unordered<T extends ModelClass<S>>(this: T): T;
+  filterBy<T extends ModelClass<S>>(this: T, filter: Filter<S>): T;
+  unfiltered<T extends ModelClass<S>>(this: T): T;
+  queryBy<T extends ModelClass<S>>(this: T): QueryBy<T, S>;
+  all<T extends ModelInstance<S>>(this: { new(): T }): Promise<T[]>;
   pluck(column: string): Promise<any[]>;
   select(columns: string[]): Promise<Dict<any>[]>;
-  updateAll(attrs: Partial<S>): Promise<ModelStatic<S>>;
-  deleteAll(): Promise<ModelStatic<S>>;
-  inBatchesOf(amount: number): Promise<Promise<ModelConstructor<S>[]>[]>;
-  readonly first: Promise<ModelConstructor<S> | undefined>;
-  find(query: Filter<S>): Promise<undefined | ModelConstructor<S>>;
-  readonly findBy: FindBy<S>;
-  readonly count: Promise<number>;
+  updateAll<T extends ModelClass<S>>(this: T, attrs: Partial<S>): Promise<T>;
+  deleteAll<T extends ModelClass<S>>(this: T): Promise<T>;
+  inBatchesOf<T extends ModelInstance<S>>(this: { new(): T }, n: number): Promise<Promise<T[]>[]>;
+  first<T extends ModelInstance<S>>(this: { new(): T }): Promise<T | undefined>;
+  find<T extends ModelInstance<S>>(this: { new(): T }, query: Filter<S>): Promise<T | undefined>;
+  findBy<T extends ModelInstance<S>>(this: { new(): T }): FindBy<T, S>;
+  count(): Promise<number>;
   execute(query: string, bindings: BaseType[]): Promise<Dict<any>[]>;
-
-  new(attrs: S): ModelConstructor<S>;
-  build(attrs: S): ModelConstructor<S>;
-  create(attrs: S): Promise<ModelConstructor<S>>;
+  new(attrs: S): ModelInstance<S>;
+  build<T extends ModelInstance<S>>(this: { new(): T }, attrs: S): T;
+  create<T extends ModelInstance<S>>(this: { new(): T }, attrs: S): Promise<T>;
   // prototype: S;
 }
 
-export abstract class ModelStaticClass<
-  S extends Schema,
-  M extends ModelStatic<S>,
-  I extends ModelConstructor<S>,
-  > {
-  // abstract new(model: M): ModelStaticClass<S, M, I>;
-
-  abstract limitBy(amount: number): M;
-  abstract readonly unlimited: M;
-  abstract skipBy(amount: number): M;
-  abstract readonly unskipped: M;
-
-  abstract orderBy(order: Partial<Order<S>>): M;
-  abstract reorder(order: Partial<Order<S>>): M;
-  abstract readonly unordered: M;
-  abstract filterBy(query: Filter<S>): M;
-  abstract readonly queryBy: QueryByModel<S, M>;
-  abstract readonly unfiltered: M;
-  abstract readonly all: Promise<I[]>;
-  abstract pluck(column: string): Promise<any[]>;
-  abstract select(columns: string[]): Promise<Dict<any>[]>;
-  abstract updateAll(attrs: Partial<S>): Promise<M>;
-  abstract deleteAll(): Promise<I>;
-  abstract inBatchesOf(amount: number): Promise<Promise<I[]>[]>;
-  abstract readonly first: Promise<I | undefined>;
-  abstract find(query: Filter<S>): Promise<I | undefined>;
-  abstract readonly findBy: FindByModel<S, I>;
-  abstract readonly count: Promise<number>;
-
-  abstract build(attrs: S | undefined): I;
-  abstract create(attrs: S | undefined): Promise<I>;
-}
-
-export interface ModelConstructor<S extends Schema> {
+export interface ModelInstance<S extends Schema> {
   readonly attributes: Partial<S>;
   persistentAttributes: Partial<S>;
   readonly isNew: boolean;
@@ -197,36 +151,11 @@ export interface ModelConstructor<S extends Schema> {
   readonly changes: Partial<Changes<S>>;
   readonly changeSet: Partial<S>;
 
-  getTyped<
-    M extends ModelStatic<S>,
-    I extends ModelConstructor<S>,
-    >(): ModelConstructorClass<S, M, I>;
+  assign(attrs: Partial<S>): this;
+  revertChange(key: keyof S): this;
+  revertChanges(): this;
 
-  readonly model: ModelStatic<S>;
-
-  assign(attrs: Partial<S>): ModelConstructor<S>;
-  revertChange(key: keyof S): ModelConstructor<S>;
-  revertChanges(): ModelConstructor<S>;
-
-  save(): Promise<ModelConstructor<S>>;
-  delete(): Promise<ModelConstructor<S>>;
-  reload(): Promise<ModelConstructor<S> | undefined>;
-}
-
-export abstract class ModelConstructorClass<
-  S extends Schema,
-  M extends ModelStatic<S>,
-  I extends ModelConstructor<S>,
-  > {
-  // abstract new(instance: I): ModelConstructorClass<S, M, I>;
-
-  readonly model: M;
-
-  abstract assign(attrs: Partial<S>): I;
-  abstract revertChange(key: keyof S): I;
-  abstract revertChanges(): I;
-
-  abstract save(): Promise<I>;
-  abstract delete(): Promise<I>;
-  abstract reload(): Promise<I | undefined>;
+  save(): Promise<this>;
+  delete(): Promise<this>;
+  reload(): Promise<this | undefined>;
 }
