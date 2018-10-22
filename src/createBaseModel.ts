@@ -1,6 +1,6 @@
 import {
-  ModelConstructor,
-  ModelStatic,
+  ModelInstance,
+  ModelClass,
   Schema,
   QueryBy,
   FindBy,
@@ -22,19 +22,11 @@ import {
 } from './util';
 
 import {
-  Model,
-} from './Model';
-
-import {
-  Instance,
-} from './Instance';
-
-import {
   Pool,
 } from 'pg';
 
-export function createBaseModel<S extends Schema>(): ModelStatic<S> {
-  @staticImplements<ModelStatic<S>>()
+export function createBaseModel<S extends Schema>(): ModelClass<S> {
+  @staticImplements<ModelClass<S>>()
   class Class {
     private static cachedColumnNames: Dict<string> | undefined;
     static pool = new Pool();
@@ -69,70 +61,75 @@ export function createBaseModel<S extends Schema>(): ModelStatic<S> {
       return this.cachedColumnNames = columnNames;
     }
 
-    static getTyped<M extends ModelStatic<S>, I extends ModelConstructor<S>>(): Model<S, M, I> {
-      return new Model<S, M, I>(<any>this);
-    }
-
-    static limitBy(amount: number): typeof Class {
+    static limitBy<T extends ModelClass<S>>(this: T, amount: number): T {
+      /// @ts-ignore
       return class extends this {
         static limit: number | undefined = amount;
       };
     }
 
-    static get unlimited(): typeof Class {
+    static unlimited<T extends ModelClass<S>>(this: T): T {
+      /// @ts-ignore
       return class extends this {
         static limit: number | undefined = undefined;
       };
     }
 
-    static skipBy(amount: number): typeof Class {
+    static skipBy<T extends ModelClass<S>>(this: T, amount: number): T {
+      /// @ts-ignore
       return class extends this {
         static skip: number | undefined = amount;
       };
     }
 
-    static get unskipped(): typeof Class {
+    static unskipped<T extends ModelClass<S>>(this: T): T {
+      /// @ts-ignore
       return class extends this {
         static skip: number | undefined = undefined;
       };
     }
 
-    static orderBy(order: Order<S>): typeof Class {
+    static orderBy<T extends ModelClass<S>>(this: T, order: Order<S>): T {
       const currentOrder = this.order;
 
+      /// @ts-ignore
       return class extends this {
         static order: Order<S>[] = [...currentOrder, order];
       };
     }
 
-    static reorder(order: Order<S>): typeof Class {
+    static reorder<T extends ModelClass<S>>(this: T, order: Order<S>): T {
+      /// @ts-ignore
       return class extends this {
         static order: Order<S>[] = [order];
       };
     }
 
-    static get unordered(): typeof Class {
+    static unordered<T extends ModelClass<S>>(this: T): T {
+      /// @ts-ignore
       return class extends this {
         static order: Order<S>[] = [];
       };
     }
 
-    static filterBy(filter: Filter<S>): typeof Class {
+    static filterBy<T extends ModelClass<S>>(this: T, filter: Filter<S>): T {
       const currentFilter = this.filter;
 
+      /// @ts-ignore
       return class extends this {
         static filter: Filter<S> = { $and: [currentFilter, filter] };
       };
     }
 
-    static get unfiltered(): typeof Class {
+    static unfiltered<T extends ModelClass<S>>(this: T): T {
+      /// @ts-ignore
       return class extends this {
         static filter: Filter<S> = {};
       };
     }
 
-    static get queryBy(): QueryBy<S> {
-      const queryBy = <QueryBy<S>>{};
+    static queryBy<T extends ModelClass<S>>(this: T): QueryBy<T, S> {
+      const queryBy = <QueryBy<T, S>>{};
       for (const key in this.columns) {
         queryBy[key] = value => this.filterBy(
           Array.isArray(value)
@@ -143,46 +140,59 @@ export function createBaseModel<S extends Schema>(): ModelStatic<S> {
       return queryBy;
     }
 
-    static get all(): Promise<Class[]> {
-      return <Promise<Class[]>>this.connector.query(this);
+    static all<T extends ModelInstance<S>>(this: { new(): T }): Promise<T[]> {
+      /// @ts-ignore
+      return this.connector.query(this);
     }
 
-    static async updateAll(attrs: Partial<S>): Promise<typeof Class> {
+    static async updateAll<T extends ModelClass<S>>(this: T, attrs: Partial<S>): Promise<T> {
       await this.connector.updateAll(this, attrs);
       return this;
     }
 
-    static async deleteAll(): Promise<typeof Class> {
+    static async deleteAll<T extends ModelClass<S>>(this: T): Promise<T> {
       await this.connector.deleteAll(this);
       return this;
     }
 
-    static async inBatchesOf(amount: number): Promise<Promise<Class[]>[]> {
-      const count = await this.count;
+    static async inBatchesOf<T extends ModelInstance<S>>(
+      this: { new(): T },
+      amount: number,
+    ): Promise<Promise<T[]>[]> {
+      const count = await (<ModelClass<S>><any>this).count();
       const batchCount = Math.ceil(count / amount);
       if (batchCount > 0 && batchCount < Number.MAX_SAFE_INTEGER) {
         const subqueries: Promise<Class[]>[] = [];
         for (let batchIndex = 0; batchIndex < batchCount; batchIndex += 1) {
-          const skip = (this.skip || 0) + batchIndex * amount;
+          const skip = ((<ModelClass<S>><any>this).skip || 0) + batchIndex * amount;
           const limit = batchIndex !== batchCount - 1 ? amount : count - (batchCount - 1) * amount;
-          subqueries.push(this.skipBy(skip).limitBy(limit).all);
+          /// @ts-ignore
+          subqueries.push(this.skipBy(skip).limitBy(limit).all());
         }
+        /// @ts-ignore
         return subqueries;
       }
       return [];
     }
 
-    static get first(): Promise<Class | undefined> {
-      return this.limitBy(1).all.then(instances => instances[0]);
+    static first<T extends ModelInstance<S>>(this: { new(): T }): Promise<T | undefined> {
+      /// @ts-ignore
+      return this.limitBy(1).all().then(instances => instances[0]);
     }
 
-    static find(filter: Filter<S>): Promise<Class | undefined> {
+    static find<T extends ModelInstance<S>>(
+      this: { new(): T },
+      filter: Filter<S>,
+    ): Promise<T | undefined> {
+      /// @ts-ignore
       return this.filterBy(filter).first;
     }
 
-    static get findBy(): FindBy<S> {
-      const findBy = <FindBy<S>>{};
+    static findBy<T extends ModelInstance<S>>(this: { new(): T }): FindBy<T, S> {
+      const findBy = <FindBy<T, S>>{};
+      /// @ts-ignore
       for (const key in this.columns) {
+        /// @ts-ignore
         findBy[key] = value => this.find(Array.isArray(value)
           ? <Filter<any>>{ $in: { [key]: value } }
           : <Filter<any>>{ [key]: value },
@@ -191,7 +201,8 @@ export function createBaseModel<S extends Schema>(): ModelStatic<S> {
       return findBy;
     }
 
-    static get count(): Promise<number> {
+    static count(): Promise<number> {
+      /// @ts-ignore
       return this.connector.count(this);
     }
 
@@ -200,10 +211,12 @@ export function createBaseModel<S extends Schema>(): ModelStatic<S> {
     }
 
     static select(columns: string[]): Promise<Dict<any>[]> {
+      /// @ts-ignore
       return this.connector.select(this, columns);
     }
 
     static execute(query: string, bindings: BaseType[]): Promise<Dict<any>[]> {
+      /// @ts-ignore
       return this.connector.execute(this, query, bindings);
     }
 
@@ -211,18 +224,21 @@ export function createBaseModel<S extends Schema>(): ModelStatic<S> {
       this.assign(attrs);
     }
 
-    static build(attrs: S): Class {
+    static build<T extends ModelInstance<S>>(this: { new(): T }, attrs: S): T {
+      /// @ts-ignore
       return new this(attrs);
     }
 
-    static create(attrs: S): Promise<Class> {
+    static create<T extends ModelInstance<S>>(this: { new(): T }, attrs: S): Promise<T> {
+      /// @ts-ignore
       return new this(attrs).save();
     }
 
-    get model(): typeof Class {
+    model<T extends ModelClass<S>>(this: T): T {
       const constructor: typeof Class = <any>this.constructor;
       const identifier = constructor.identifier;
       const query = { [identifier]: (<Partial<S>><any>this)[identifier] };
+      /// @ts-ignore
       return class extends constructor {
         static filter: Filter<S> = query;
         static limit: number | undefined = undefined;
@@ -232,7 +248,7 @@ export function createBaseModel<S extends Schema>(): ModelStatic<S> {
 
     get attributes(): Partial<S> {
       const attrs: Partial<S> = {};
-      for (const key in this.model.columns) {
+      for (const key in this.model().columns) {
         attrs[key] = (<Partial<S>><any>this)[key];
       }
       return attrs;
@@ -274,42 +290,49 @@ export function createBaseModel<S extends Schema>(): ModelStatic<S> {
       return changes;
     }
 
-    getTyped<M extends ModelStatic<S>, I extends ModelConstructor<S>>(): Instance<S, M, I> {
-      return new Instance<S, M, I>(<any>this);
-    }
-
-    assign(attrs: Partial<S>): Class {
+    assign<T extends ModelInstance<S>>(this: { new(): T }, attrs: Partial<S>): T {
       for (const key in attrs) {
-        (<Partial<S>><any>this)[key] = attrs[key];
+        (<any>this)[key] = attrs[key];
       }
+      /// @ts-ignore
       return this;
     }
 
-    revertChange(key: keyof S): Class {
-      (<Partial<S>><any>this)[key] = this.persistentAttributes[key];
+    revertChange<T extends ModelInstance<S>>(this: { new(): T }, key: keyof S): T {
+      /// @ts-ignore
+      (<any>this)[key] = this.persistentAttributes[key];
+      /// @ts-ignore
       return this;
     }
 
-    revertChanges(): Class {
-      for (const key of this.model.keys) {
+    revertChanges<T extends ModelInstance<S>>(this: { new(): T }): T {
+      /// @ts-ignore
+      for (const key of this.model().keys) {
+        /// @ts-ignore
         this.revertChange(key);
       }
+      /// @ts-ignore
       return this;
     }
 
-    save(): Promise<Class> {
+    save<T extends ModelInstance<S>>(this: { new(): T }): Promise<T> {
+      /// @ts-ignore
       return this.isNew
-        ? <Promise<Class>>this.model.connector.create(this)
-        : <Promise<Class>>this.model.connector.update(this)
+        /// @ts-ignore
+        ? <Promise<Class>>this.model().connector.create(this)
+        /// @ts-ignore
+        : <Promise<Class>>this.model().connector.update(this)
         ;
     }
 
-    delete(): Promise<Class> {
+    delete<T extends ModelInstance<S>>(this: { new(): T }): Promise<T> {
+      /// @ts-ignore
       return <Promise<Class>>this.model.connector.delete(this);
     }
 
-    reload(): Promise<Class | undefined> {
-      return this.model.first;
+    reload<T extends ModelInstance<S>>(this: { new(): T }): Promise<T | undefined> {
+      /// @ts-ignore
+      return this.model().first;
     }
   }
 
