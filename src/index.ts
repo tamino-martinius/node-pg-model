@@ -1,5 +1,5 @@
 export * from './types';
 export * from './Model';
-export * from './getConnector';
+export * from './Connector';
 export * from './Model';
 export * from './util';
