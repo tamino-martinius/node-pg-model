@@ -380,7 +380,7 @@ export class Model {
     return changes;
   }
 
-  assign<S, I extends Model, M extends typeof Model & { new(attrs: S): I }>(
+  assign<S, I extends Model, _ extends typeof Model & { new(attrs: S): I }>(
     this: I,
     attrs: Dict<any>,
   ): I {
@@ -390,7 +390,7 @@ export class Model {
     return this;
   }
 
-  revertChange<S, I extends Model, M extends typeof Model & { new(attrs: S): I }>(
+  revertChange<S, I extends Model, _ extends typeof Model & { new(attrs: S): I }>(
     this: I,
     key: string,
   ): I {
@@ -398,7 +398,7 @@ export class Model {
     return this;
   }
 
-  revertChanges<S, I extends Model, M extends typeof Model & { new(attrs: S): I }>(
+  revertChanges<S, I extends Model, _ extends typeof Model & { new(attrs: S): I }>(
     this: I,
   ): I {
     for (const key of this.model().keys) {
@@ -407,7 +407,7 @@ export class Model {
     return this;
   }
 
-  save<S, I extends Model, M extends typeof Model & { new(attrs: S): I }>(
+  save<S, I extends Model, _ extends typeof Model & { new(attrs: S): I }>(
     this: I,
   ): Promise<I> {
     return this.isNew
@@ -416,13 +416,13 @@ export class Model {
       ;
   }
 
-  delete<S, I extends Model, M extends typeof Model & { new(attrs: S): I }>(
+  delete<S, I extends Model, _ extends typeof Model & { new(attrs: S): I }>(
     this: I,
   ): Promise<I> {
     return this.model().connector.delete(this);
   }
 
-  reload<S, I extends Model, M extends typeof Model & { new(attrs: S): I }>(
+  reload<S, I extends Model, _ extends typeof Model & { new(attrs: S): I }>(
     this: I,
   ): Promise<I | undefined> {
     return this.model().first();
