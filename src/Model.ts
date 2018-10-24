@@ -3,8 +3,8 @@ import {
 } from './types';
 
 import {
-  getConnector,
-} from './getConnector';
+  Connector,
+} from './Connector';
 
 import {
   Pool,
@@ -101,7 +101,8 @@ export class Model {
   static limit: number | undefined = undefined;
   static skip: number | undefined = undefined;
   static order: Order[] = [];
-  static connector = getConnector();
+  static connector = new Connector();
+  static columnNames: Dict<string> = {};
   persistentAttributes: Dict<any> = {};
 
   static limitBy<S, I extends Model, M extends typeof Model & { new(attrs: S): I }>(
@@ -212,7 +213,7 @@ export class Model {
   static all<S, I extends Model, M extends typeof Model & { new(attrs: S): I }>(
     this: M & { new(attrs: S): I },
   ): Promise<I[]> {
-    return this.connector.query(this);
+    return <Promise<I[]>>this.connector.query(this);
   }
 
   static async updateAll<S, I extends Model, M extends typeof Model & { new(attrs: S): I }>(
@@ -411,15 +412,15 @@ export class Model {
     this: I,
   ): Promise<I> {
     return this.isNew
-      ? this.model().connector.create(this)
-      : this.model().connector.update(this)
+      ? <Promise<I>>this.model().connector.create(this)
+      : <Promise<I>>this.model().connector.update(this)
       ;
   }
 
   delete<S, I extends Model, _ extends typeof Model & { new(attrs: S): I }>(
     this: I,
   ): Promise<I> {
-    return this.model().connector.delete(this);
+    return <Promise<I>>this.model().connector.delete(this);
   }
 
   reload<S, I extends Model, _ extends typeof Model & { new(attrs: S): I }>(
