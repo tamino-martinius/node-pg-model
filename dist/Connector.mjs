@@ -264,7 +264,7 @@ async function getInsert(model, values, attrs) {
     return `INSERT INTO "${model.tableName}" (${insertColumns.join(', ')})
 VALUES (${insertValues.join(', ')})`;
 }
-async function getSelect(model, columns = Object.keys(model.columns).map(column => `"${model.tableName}"."${column}"`)) {
+async function getSelect(model, columns = model.keys.map(column => `"${model.tableName}"."${column}"`)) {
     return `SELECT ${columns.join(', ')}`;
 }
 async function getFrom(model) {
@@ -293,115 +293,114 @@ function query(model, queryText, values) {
     console.log({ queryText, values });
     return model.pool.query(queryText, values);
 }
-export function getConnector() {
-    return {
-        async query(model) {
-            const values = [];
-            const queryText = `
+export class Connector {
+    async query(model) {
+        const values = [];
+        const queryText = `
 ${await getSelect(model)}
 ${await getFrom(model)}
 ${await getWhere(model, values)}
 ${await getLimit(model)}
 ${await getOffset(model)}
 `;
-            const { rows } = await query(model, queryText, values);
-            return rows.map((row) => {
-                const instance = new model(rowToJs(model, row));
-                instance.persistentAttributes = instance.attributes;
-                return instance;
-            });
-        },
-        async count(model) {
-            const values = [];
-            const queryText = `
+        const { rows } = await query(model, queryText, values);
+        return rows.map((row) => {
+            const instance = new model(rowToJs(model, row));
+            instance.persistentAttributes = instance.attributes;
+            return instance;
+        });
+    }
+    async count(model) {
+        const values = [];
+        const queryText = `
 ${await getSelect(model, [`COUNT("${model.tableName}"."${model.identifier}") AS count`])}
 ${await getFrom(model)}
 ${await getWhere(model, values)}
 ${await getLimit(model)}
 ${await getOffset(model)}
 `;
-            const { rows } = await query(model, queryText, values);
-            return rows[0].count;
-        },
-        async select(model, columns) {
-            const values = [];
-            const queryText = `
+        const { rows } = await query(model, queryText, values);
+        return rows[0].count;
+    }
+    async select(model, columns) {
+        const values = [];
+        const queryText = `
 ${await getSelect(model, columns)}
 ${await getFrom(model)}
 ${await getWhere(model, values)}
 ${await getLimit(model)}
 ${await getOffset(model)}
 `;
-            const { rows } = await query(model, queryText, values);
-            return rows.map(row => rowToJs(model, row));
-        },
-        async updateAll(model, attrs) {
-            const values = [];
-            const queryText = `
+        const { rows } = await query(model, queryText, values);
+        return rows.map(row => rowToJs(model, row));
+    }
+    async updateAll(model, attrs) {
+        const values = [];
+        const queryText = `
 ${await getUpdate(model)}
 ${await getSet(model, values, attrs)}
 ${await getWhere(model, values)}
 ${await getLimit(model)}
 ${await getOffset(model)}
 `;
-            const { rowCount } = await query(model, queryText, values);
-            return rowCount;
-        },
-        async deleteAll(model) {
-            const values = [];
-            const queryText = `
+        const { rowCount } = await query(model, queryText, values);
+        return rowCount;
+    }
+    async deleteAll(model) {
+        const values = [];
+        const queryText = `
 DELETE ${await getFrom(model)}
 ${await getWhere(model, values)}
 ${await getLimit(model)}
 ${await getOffset(model)}
 `;
-            const { rowCount } = await query(model, queryText, values);
-            return rowCount;
-        },
-        async create(instance) {
-            const model = instance.model;
-            const values = [];
-            const queryText = `
+        const { rowCount } = await query(model, queryText, values);
+        return rowCount;
+    }
+    async create(instance) {
+        const model = instance.model();
+        const values = [];
+        const queryText = `
 ${await getInsert(model, values, instance.attributes)}
 ${await getReturning(model)}
 `;
-            const { rows } = await query(model, queryText, values);
-            const attrs = rowToJs(model, rows[0]);
-            instance[model.identifier] = attrs[model.identifier.toString()];
-            instance.persistentAttributes = instance.attributes;
-            return instance;
-        },
-        async update(instance) {
-            const model = instance.model;
-            const values = [];
-            const queryText = `
+        const { rows } = await query(model, queryText, values);
+        const attrs = rowToJs(model, rows[0]);
+        instance[model.identifier] = attrs[model.identifier.toString()];
+        instance.persistentAttributes = instance.attributes;
+        return instance;
+    }
+    async update(instance) {
+        const model = instance.model();
+        const values = [];
+        const queryText = `
 ${await getUpdate(model)}
 ${await getSet(model, values, instance.changeSet)}
 ${await getWhere(model, values)}
 ${await getLimit(model)}
 ${await getOffset(model)}
 `;
-            await query(model, queryText, values);
-            instance.persistentAttributes = instance.attributes;
-            return instance;
-        },
-        async delete(instance) {
-            const model = instance.model;
-            const values = [];
-            const queryText = `
+        await query(model, queryText, values);
+        instance.persistentAttributes = instance.attributes;
+        return instance;
+    }
+    async delete(instance) {
+        const model = instance.model();
+        const values = [];
+        const queryText = `
 DELETE ${await getFrom(model)}
 ${await getWhere(model, values)}
 ${await getLimit(model)}
 ${await getOffset(model)}
 `;
-            await query(model, queryText, values);
-            instance[model.identifier] = undefined;
-            return instance;
-        },
-        async execute(model, queryText, values) {
-            const { rows } = await query(model, queryText, values);
-            return rows.map(row => rowToJs(model, row));
-        },
-    };
+        await query(model, queryText, values);
+        instance[model.identifier] = undefined;
+        return instance;
+    }
+    async execute(model, queryText, values) {
+        const { rows } = await query(model, queryText, values);
+        return rows.map(row => rowToJs(model, row));
+    }
 }
-//# sourceMappingURL=getConnector.mjs.map
+export default Connector;
+//# sourceMappingURL=Connector.mjs.map

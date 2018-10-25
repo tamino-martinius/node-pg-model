@@ -314,7 +314,7 @@ function getInsert(model, values, attrs) {
 VALUES (${insertValues.join(', ')})`;
     });
 }
-function getSelect(model, columns = Object.keys(model.columns).map(column => `"${model.tableName}"."${column}"`)) {
+function getSelect(model, columns = model.keys.map(column => `"${model.tableName}"."${column}"`)) {
     return __awaiter(this, void 0, void 0, function* () {
         return `SELECT ${columns.join(', ')}`;
     });
@@ -357,134 +357,133 @@ function query(model, queryText, values) {
     console.log({ queryText, values });
     return model.pool.query(queryText, values);
 }
-function getConnector() {
-    return {
-        query(model) {
-            return __awaiter(this, void 0, void 0, function* () {
-                const values = [];
-                const queryText = `
+class Connector {
+    query(model) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const values = [];
+            const queryText = `
 ${yield getSelect(model)}
 ${yield getFrom(model)}
 ${yield getWhere(model, values)}
 ${yield getLimit(model)}
 ${yield getOffset(model)}
 `;
-                const { rows } = yield query(model, queryText, values);
-                return rows.map((row) => {
-                    const instance = new model(rowToJs(model, row));
-                    instance.persistentAttributes = instance.attributes;
-                    return instance;
-                });
+            const { rows } = yield query(model, queryText, values);
+            return rows.map((row) => {
+                const instance = new model(rowToJs(model, row));
+                instance.persistentAttributes = instance.attributes;
+                return instance;
             });
-        },
-        count(model) {
-            return __awaiter(this, void 0, void 0, function* () {
-                const values = [];
-                const queryText = `
+        });
+    }
+    count(model) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const values = [];
+            const queryText = `
 ${yield getSelect(model, [`COUNT("${model.tableName}"."${model.identifier}") AS count`])}
 ${yield getFrom(model)}
 ${yield getWhere(model, values)}
 ${yield getLimit(model)}
 ${yield getOffset(model)}
 `;
-                const { rows } = yield query(model, queryText, values);
-                return rows[0].count;
-            });
-        },
-        select(model, columns) {
-            return __awaiter(this, void 0, void 0, function* () {
-                const values = [];
-                const queryText = `
+            const { rows } = yield query(model, queryText, values);
+            return rows[0].count;
+        });
+    }
+    select(model, columns) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const values = [];
+            const queryText = `
 ${yield getSelect(model, columns)}
 ${yield getFrom(model)}
 ${yield getWhere(model, values)}
 ${yield getLimit(model)}
 ${yield getOffset(model)}
 `;
-                const { rows } = yield query(model, queryText, values);
-                return rows.map(row => rowToJs(model, row));
-            });
-        },
-        updateAll(model, attrs) {
-            return __awaiter(this, void 0, void 0, function* () {
-                const values = [];
-                const queryText = `
+            const { rows } = yield query(model, queryText, values);
+            return rows.map(row => rowToJs(model, row));
+        });
+    }
+    updateAll(model, attrs) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const values = [];
+            const queryText = `
 ${yield getUpdate(model)}
 ${yield getSet(model, values, attrs)}
 ${yield getWhere(model, values)}
 ${yield getLimit(model)}
 ${yield getOffset(model)}
 `;
-                const { rowCount } = yield query(model, queryText, values);
-                return rowCount;
-            });
-        },
-        deleteAll(model) {
-            return __awaiter(this, void 0, void 0, function* () {
-                const values = [];
-                const queryText = `
+            const { rowCount } = yield query(model, queryText, values);
+            return rowCount;
+        });
+    }
+    deleteAll(model) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const values = [];
+            const queryText = `
 DELETE ${yield getFrom(model)}
 ${yield getWhere(model, values)}
 ${yield getLimit(model)}
 ${yield getOffset(model)}
 `;
-                const { rowCount } = yield query(model, queryText, values);
-                return rowCount;
-            });
-        },
-        create(instance) {
-            return __awaiter(this, void 0, void 0, function* () {
-                const model = instance.model;
-                const values = [];
-                const queryText = `
+            const { rowCount } = yield query(model, queryText, values);
+            return rowCount;
+        });
+    }
+    create(instance) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = instance.model();
+            const values = [];
+            const queryText = `
 ${yield getInsert(model, values, instance.attributes)}
 ${yield getReturning(model)}
 `;
-                const { rows } = yield query(model, queryText, values);
-                const attrs = rowToJs(model, rows[0]);
-                instance[model.identifier] = attrs[model.identifier.toString()];
-                instance.persistentAttributes = instance.attributes;
-                return instance;
-            });
-        },
-        update(instance) {
-            return __awaiter(this, void 0, void 0, function* () {
-                const model = instance.model;
-                const values = [];
-                const queryText = `
+            const { rows } = yield query(model, queryText, values);
+            const attrs = rowToJs(model, rows[0]);
+            instance[model.identifier] = attrs[model.identifier.toString()];
+            instance.persistentAttributes = instance.attributes;
+            return instance;
+        });
+    }
+    update(instance) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = instance.model();
+            const values = [];
+            const queryText = `
 ${yield getUpdate(model)}
 ${yield getSet(model, values, instance.changeSet)}
 ${yield getWhere(model, values)}
 ${yield getLimit(model)}
 ${yield getOffset(model)}
 `;
-                yield query(model, queryText, values);
-                instance.persistentAttributes = instance.attributes;
-                return instance;
-            });
-        },
-        delete(instance) {
-            return __awaiter(this, void 0, void 0, function* () {
-                const model = instance.model;
-                const values = [];
-                const queryText = `
+            yield query(model, queryText, values);
+            instance.persistentAttributes = instance.attributes;
+            return instance;
+        });
+    }
+    delete(instance) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const model = instance.model();
+            const values = [];
+            const queryText = `
 DELETE ${yield getFrom(model)}
 ${yield getWhere(model, values)}
 ${yield getLimit(model)}
 ${yield getOffset(model)}
 `;
-                yield query(model, queryText, values);
-                instance[model.identifier] = undefined;
-                return instance;
-            });
-        },
-        execute(model, queryText, values) {
-            return __awaiter(this, void 0, void 0, function* () {
-                const { rows } = yield query(model, queryText, values);
-                return rows.map(row => rowToJs(model, row));
-            });
-        },
-    };
+            yield query(model, queryText, values);
+            instance[model.identifier] = undefined;
+            return instance;
+        });
+    }
+    execute(model, queryText, values) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { rows } = yield query(model, queryText, values);
+            return rows.map(row => rowToJs(model, row));
+        });
+    }
 }
-exports.getConnector = getConnector;
-//# sourceMappingURL=getConnector.js.map
+exports.Connector = Connector;
+exports.default = Connector;
+//# sourceMappingURL=Connector.js.map
