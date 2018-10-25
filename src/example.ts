@@ -61,24 +61,24 @@ class Address extends Model implements AddressSchema {
   }
 }
 
-async () => {
-  const address1 = await Address.first();
-  const user1 = address1 ? address1.user : undefined;
-  const addresses2 = Address.limitBy(12).filterBy({
-    street: 'a',
-  });
-  const addresses3 = Address.filterBy({
-    x: 'a', // invalid
-  });
-  const addresses4 = Address.filterBy({
-    $async: Promise.resolve({
-      street: 'a',
-    }),
-  });
-  const addresses5 = Address.filterBy({
-    $gt: { street: 'a' },
-  });
-  const addresses6 = Address.filterBy({
-    $in: { street: ['a'] },
-  });
-};
+// async () => {
+//   const address1 = await Address.first();
+//   const user1 = address1 ? address1.user : undefined;
+//   const addresses2 = Address.limitBy(12).filterBy({
+//     street: 'a',
+//   });
+//   const addresses3 = Address.filterBy({
+//     x: 'a', // invalid
+//   });
+//   const addresses4 = Address.filterBy({
+//     $async: Promise.resolve({
+//       street: 'a',
+//     }),
+//   });
+//   const addresses5 = Address.filterBy({
+//     $gt: { street: 'a' },
+//   });
+//   const addresses6 = Address.filterBy({
+//     $in: { street: ['a'] },
+//   });
+// };
