@@ -1,4 +1,4 @@
-import { Dict } from './types';
+import { Dict, Required } from './types';
 import { Connector } from './Connector';
 import { Pool } from 'pg';
 export interface Range<T> {
@@ -108,7 +108,7 @@ export declare class Model {
         new (attrs: S): I;
     }>(this: M & {
         new (attrs: S): I;
-    }, filter: Filter<S>): M;
+    }, filter: Filter<Required<S>>): M;
     static unfiltered<S, I extends Model, M extends typeof Model & {
         new (attrs: S): I;
     }>(this: M & {
@@ -118,7 +118,7 @@ export declare class Model {
         new (attrs: S): I;
     }>(this: M & {
         new (attrs: S): I;
-    }): QueryBy<M, S>;
+    }): QueryBy<M, Required<S>>;
     static all<S, I extends Model, M extends typeof Model & {
         new (attrs: S): I;
     }>(this: M & {
@@ -148,12 +148,12 @@ export declare class Model {
         new (attrs: S): I;
     }>(this: M & {
         new (attrs: S): I;
-    }, filter: Filter<S>): Promise<I | undefined>;
+    }, filter: Filter<Required<S>>): Promise<I | undefined>;
     static findBy<S, I extends Model, M extends typeof Model & {
         new (attrs: S): I;
     }>(this: M & {
         new (attrs: S): I;
-    }): FindBy<I, S>;
+    }): FindBy<I, Required<S>>;
     static count<S, I extends Model, M extends typeof Model & {
         new (attrs: S): I;
     }>(this: M & {
