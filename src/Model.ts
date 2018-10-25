@@ -1,5 +1,6 @@
 import {
   Dict,
+  Required,
 } from './types';
 
 import {
@@ -68,6 +69,7 @@ export enum Direction {
 export type SchemaMapping<S extends Dict<any>, T> = {
   [K in keyof S]: T;
 };
+
 export type Order<S extends Schema = Dict<any>> = Partial<SchemaMapping<S, Direction>>;
 export type ColumnMapping = Dict<string>;
 
@@ -177,13 +179,13 @@ export class Model {
 
   static filterBy<S, I extends Model, M extends typeof Model & { new(attrs: S): I }>(
     this: M & { new(attrs: S): I },
-    filter: Filter<S>,
+    filter: Filter<Required<S>>,
   ): M {
     const currentFilter = this.filter;
 
     /// @ts-ignore
     return class extends this {
-      static filter: Filter<S> = { $and: [currentFilter, filter] };
+      static filter: Filter<Required<S>> = { $and: [currentFilter, filter] };
     };
   }
 
@@ -192,14 +194,14 @@ export class Model {
   ): M {
     /// @ts-ignore
     return class extends this {
-      static filter: Filter<S> = {};
+      static filter: Filter<Required<S>> = {};
     };
   }
 
   static queryBy<S, I extends Model, M extends typeof Model & { new(attrs: S): I }>(
     this: M & { new(attrs: S): I },
-  ): QueryBy<M, S> {
-    const queryBy = <QueryBy<M, S>>{};
+  ): QueryBy<M, Required<S>> {
+    const queryBy = <QueryBy<M, Required<S>>>{};
     for (const key in this.keys) {
       queryBy[<keyof S>key] = value => this.filterBy(
         Array.isArray(value)
@@ -257,15 +259,15 @@ export class Model {
 
   static find<S, I extends Model, M extends typeof Model & { new(attrs: S): I }>(
     this: M & { new(attrs: S): I },
-    filter: Filter<S>,
+    filter: Filter<Required<S>>,
   ): Promise<I | undefined> {
     return this.filterBy(filter).first();
   }
 
   static findBy<S, I extends Model, M extends typeof Model & { new(attrs: S): I }>(
     this: M & { new(attrs: S): I },
-  ): FindBy<I, S> {
-    const findBy = <FindBy<I, S>>{};
+  ): FindBy<I, Required<S>> {
+    const findBy = <FindBy<I, Required<S>>>{};
     for (const key in this.keys) {
       findBy[<keyof S>key] = value => this.find(Array.isArray(value)
         ? <Filter<any>>{ $in: { [key]: value } }
