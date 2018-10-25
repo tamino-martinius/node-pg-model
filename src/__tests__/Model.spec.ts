@@ -1,11 +1,9 @@
 import {
-  createBaseModel,
-  Columns,
   Model,
-  Instance,
 } from '..';
 
 import { Pool } from 'pg';
+import { column } from '../Model';
 
 it('test', async () => {
   interface UserSchema {
@@ -14,29 +12,26 @@ it('test', async () => {
     lastName: string;
   }
 
-  class User extends createBaseModel<UserSchema>() implements UserSchema {
+  class User extends Model implements UserSchema {
     static pool = new Pool({ database: 'nextcode' });
+
+    @column()
     id: number;
+
+    @column()
     firstName: string;
+
+    @column()
     lastName: string;
 
     static tableName = 'users';
-    static columns: Columns<UserSchema> = {
-      id: { type: 'Serial' },
-      firstName: { type: 'CharVarying' },
-      lastName: { type: 'CharVarying' },
-    };
-
-    static get $(): Model<UserSchema, typeof User, User> {
-      return <any>this.getTyped();
-    }
-
-    get $(): Instance<UserSchema, typeof User, User> {
-      return <any>this.getTyped();
-    }
 
     get addresses() {
-      return Address.$.queryBy.userId(this.id);
+      return Address.queryBy().userId(this.id);
+    }
+
+    constructor(attrs: UserSchema) {
+      super(attrs);
     }
   }
 
@@ -47,35 +42,29 @@ it('test', async () => {
     city: string;
   }
 
-  class Address extends createBaseModel<AddressSchema>() implements AddressSchema {
+  class Address extends Model implements AddressSchema {
     static pool = new Pool({ database: 'nextcode' });
+
+    @column()
     id: number;
+
+    @column()
     userId: number;
+
+    @column()
     street: string;
+
+    @column()
     city: string;
 
     static tableName = 'addresses';
 
-    static columns: Columns<AddressSchema> = {
-      id: { type: 'Serial' },
-      userId: { type: 'Integer' },
-      city: { type: 'CharVarying' },
-      street: { type: 'CharVarying' },
-    };
-
-    static get $(): Model<AddressSchema, typeof Address, Address> {
-      return <any>this.getTyped();
-    }
-
-    get $(): Instance<AddressSchema, typeof Address, Address> {
-      return <any>this.getTyped();
-    }
-
     get user() {
-      User.$.filterBy({
-        $
-      })
-      return User.$.findBy.id(this.userId);
+      return User.findBy().id(this.userId);
+    }
+
+    constructor(attrs: AddressSchema) {
+      super(attrs);
     }
   }
 });
