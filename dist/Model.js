@@ -17,7 +17,7 @@ var Direction;
 })(Direction = exports.Direction || (exports.Direction = {}));
 function column() {
     return function (target, propertyKey) {
-        target.keys.push(propertyKey);
+        target.constructor.keys = [...target.constructor.keys, propertyKey];
     };
 }
 exports.column = column;

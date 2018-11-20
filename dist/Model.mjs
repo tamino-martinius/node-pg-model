@@ -7,7 +7,7 @@ export var Direction;
 })(Direction || (Direction = {}));
 export function column() {
     return function (target, propertyKey) {
-        target.keys.push(propertyKey);
+        target.constructor.keys = [...target.constructor.keys, propertyKey];
     };
 }
 export class Model {
