@@ -90,7 +90,7 @@ export type Changes<S extends Schema> = {
 
 export function column() {
   return function (target: any, propertyKey: string) {
-    target.keys.push(propertyKey);
+    target.constructor.keys = [...target.constructor.keys, propertyKey];
   };
 }
 
